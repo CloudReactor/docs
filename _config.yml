@@ -1,6 +1,5 @@
 title: Docs | CloudReactor.io
 description: CloudReactor.io documentation and reference
-baseurl: '/docs'
-url: "https://cloudreactor.io" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://docs.cloudreactor.io"
 remote_theme: pmarsceill/just-the-docs
 ga_tracking: UA-165860121-1
