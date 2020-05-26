@@ -1,2 +1,5 @@
+title: Documentation | CloudReactor.io
+description: CloudReactor.io documentation and reference
+url: "https://cloudreactor.io" # the base hostname & protocol for your site, e.g. http://example.com
 remote_theme: pmarsceill/just-the-docs
 ga_tracking: UA-165860121-1
