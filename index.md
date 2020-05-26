@@ -3,8 +3,14 @@ layout: default
 title: Home
 nav_order: 1
 ---
-# Navigation Structure
+# Easily create, deploy, orchestrate and manage tasks in AWS
 {: .no_toc }
+{: .fs-10 }
+
+CloudReactor provides Dockerfiles and scripts that enable you to get up and running with a Python development environment, deploy code to your AWS environment, and monitor, manage and orchestrate deployed tasks with CloudReactor -- all in record time.
+{: .fs-4 .fw-300 }
+
+[Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [Learn more about CloudReactor](./context.html){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ## Table of contents
 {: .no_toc .text-delta }
@@ -12,7 +18,9 @@ nav_order: 1
 1. TOC
 {:toc}
 
-## Home
+---
+
+## Getting Started
 
 TEST123
 
