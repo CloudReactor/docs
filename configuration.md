@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Configuration
+title: Additional configuration
 nav_order: 4
 ---
 # Additional configuration

@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Managing Secrets
+title: Secret management
 nav_order: 6
 ---
 
@@ -19,11 +19,12 @@ In this example project, the files `docker_deploy.env`, `docker_deploy.<environm
 
 Three methods of managing secrets that we'll cover are:
 
-* Ansible Vault
-* git-crypt
-* AWS Secrets Manager
+1. TOC
+{:toc}
 
-### Ansible Vault
+---
+
+## Ansible Vault
 
 One option for managing either deployment or runtime secrets is to use 
 [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
@@ -56,7 +57,9 @@ you deploy from (which builds and caches Docker images) is secure.
 Once you figure out which files to encrypte, uncomment the lines in 
 `.gitignore` that ignore secret files, since you'll be checking them in encrypted.
 
-### git-crypt
+---
+
+## git-crypt
 
 Another option for encryption is 
 [git crypt](https://github.com/AGWA/git-crypt), 
@@ -71,6 +74,8 @@ the lines in `.gitattributes` that specify which files to encrypt.
 
 The disadvantage of using git-crypt is that if the machine or disk that
 contains these secret files is compromised, those secrets can be exposed. 
+
+---
 
 ## Runtime secrets (using AWS Secrets Manager)
 
