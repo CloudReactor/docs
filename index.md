@@ -12,9 +12,8 @@ CloudReactor provides Dockerfiles and scripts that enable you to get up and runn
 
 [Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [Learn more about CloudReactor](./cloudreactor.html){: .btn .fs-5 .mb-4 .mb-md-0 }
 
-{: .mt-6}
 ## Table of contents
-{: .no_toc .text-delta }
+{: .no_toc .text-delta .mt-6 }
 
 1. TOC
 {:toc}
@@ -181,9 +180,10 @@ We'll assume this is satisfactory. However, if you want to deploy natively -- pe
 
 ## The example tasks
 
-Successfully deploying this example project will create two ECS tasks which are listed in `deploy/common.yml`. They have the following behavior:
+Successfully deploying this example project will create two ECS tasks. These tasks are defined in the `./src` folder, and are `task_1.py` and `file_io.py`. These tasks are configured in `deploy/vars/common.yml`.
 
-* *task_1* also prints 30 numbers and exits successfully. While it does so, it updates the successful count and the last status message that is shown in CloudReactor, using the status updater library. It is scheduled to run daily.
+These tasks have the following behavior:
+* *task_1* prints 30 numbers and exits successfully. While it does so, it updates the "successful" count and the "last status message" that is shown in CloudReactor, using the CloudReactor status updater library. It is configured to run daily via `deploy/vars/common.yml`
 * *file_io* uses [non-persistent file storage](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-task-storage.html) to write and read numbers
 * *web_server* uses a python library dependency (Flask) to implement a web server and shows how to link an AWS Application Load Balancer (ALB) to a service. It requires that an ALB and target group be setup already, so it is not enabled by default.
 
@@ -197,8 +197,7 @@ The tasks are setup to be run with Docker Compose in `docker-compose.yml`. For e
 
     docker-compose build
 
-(You only need to run this again when you change the dependencies required by 
-the project.)
+(You only need to run this again when you change the dependencies required by the project.)
 
 Then to run, say `task_1`, type:
 
@@ -220,11 +219,23 @@ add dependencies, and run tests and checks.
 
 ## Deploying your own tasks
 
-Now that you have deployed the example tasks, you can move your existing code to this
-project. You can add or modify tasks in `deploy/common.yml` to call the commands you want,
-with configuration for the schedule, retry parameters, and environment variables.
-Feel free to delete the tasks that you don't need, just by removing the top level keys
-in `task_name_to_config`.
+### Adding new tasks
+Now that you have deployed the example tasks, you can move your existing code to this project. To add your own task:
+1. Place task code itself in a new file in `./src`, e.g. `new_task.py`
+2. Add a configuration block for the task in `deploy/vars/common.yml`, below `task_name_to_config:` A minimal configuration block is:
+    <div class="code-example" markdown="1">
+    ```python
+    new_task:
+        <<: *default_task_config
+        command: "python src/new_task.py"
+    ```
+    </div>
+    - `<<: *default_task_config` allows new_task to inherit properties from the default task configuration
+    - `command: "python src/new_task.py"` contains the command to run (in this case, to execute new_task via python)
+    - Additional parameters include the run schedule (cron expression), retry parameters, and environment variables. See [additional configuration](docs/configuration.md).
+
+### Removing tasks
+You can delete any tasks you don't need (e.g. the example `task_1` and `file_io` tasks), just by removing the top level keys and associated configuration blocks below `task_name_to_config`. These tasks won't 
 
 ---
 
