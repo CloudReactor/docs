@@ -8,29 +8,20 @@ nav_order: 5
 {: .no_toc}
 
 {: .mt-6}
-## Table of contents
-{: .no_toc .text-delta }
+
+You can set up an Alert Method if you want to be alerted if task executions fail. An Alert Method links to one or more ways of sending notifications
+when certain events occur.
+
+Currently, the only supported notification type is sending PagerDuty events. [PagerDuty](https://pagerduty.com) is powerful because it supports many ways
+of forwarding events once it receives them, for example sending an SMS message, sending an email, or sending a message to a Slack channel.
+
+To have CloudReactor send task and workflow events to PagerDuty, follow these general steps:
 
 1. TOC
 {:toc}
 
 ---
 
-If you want to be alerted if task executions fail, you'll need to set up an 
-Alert Method. An Alert Method links to one or more ways of sending notifications
-when certain events occur.
-
-Currently, the only supported notification type is sending PagerDuty events.
-[PagerDuty](https://pagerduty.com) is powerful because it supports many ways
-of forwarding events once it receives them, for example sending an SMS message,
-sending an email, or sending a message to a Slack channel.
-
-To have CloudReactor send task and workflow events to PagerDuty, follow these 
-general steps:
-
-* Create a PagerDuty Profile
-* Create an Alert Method
-* Add the Alert Method to one or more Tasks or Workflows
 
 ## Create a PagerDuty Profile
 
