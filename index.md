@@ -12,6 +12,13 @@ CloudReactor provides Dockerfiles and scripts that enable you to get up and runn
 
 [Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [Learn more about CloudReactor](./cloudreactor.html){: .btn .fs-5 .mb-4 .mb-md-0 }
 
+{: .mt-6}
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
 ---
 
 ## Getting Started
@@ -24,6 +31,7 @@ Broadly speaking, we'll need to:
 Configuration will require some keys and other parameters to be entered. We'll note anything you need to record in  <span style="color: red">red</span> -- open up a text file to hold those variables as we go along.
 
 ### Prerequisites: AWS user with deployment permissions
+{: .no_toc}
 Note that the AWS user credentials you use to deploy to AWS ECS must have permissions to deploy Docker images to ECR and to create tasks in ECS. You can either:
 1) Use an admin user or a power user with broad permissions; or
 2) Create a user and role with specific permissions for deployment; the [CloudReactor AWS deployer CloudFormation template](https://github.com/CloudReactor/aws-role-template) can help you create a user with the necessary permissions.
@@ -103,8 +111,10 @@ Then login to the [CloudReactor dashboard](https://dash.cloudreactor.io/). We'll
 
 ---
 
-### Clone & configure the CloudReactor quickstart repo; deploy tasks!
-You'll need to get this project's source code onto a filesystem where you can make changes. You can either clone this project directly, or fork it first, then clone it.
+### Clone & configure the CloudReactor quickstart repo; deploy example tasks!
+This repo contains everything you need to deploy tasks immediately to AWS, and have these tasks orchestrated, monitored and managed by CloudReactor. The repo contains simple toy tasks that are pushed to ECS below.
+
+First, you'll need to get this project's source code onto a filesystem where you can make changes. You can either clone this project directly, or fork it first, then clone it.
 
 If cloning directly:
 
@@ -166,3 +176,57 @@ We'll assume this is satisfactory. However, if you want to deploy natively -- pe
 
 {: .mt-5}
 - [x] Local repo configured with AWS and CloudReactor settings; tasks pushed to AWS ECS!
+
+
+## The example tasks
+
+Successfully deploying this example project will create two ECS tasks which are listed in `deploy/common.yml`. They have the following behavior:
+
+* *task_1* also prints 30 numbers and exits successfully. While it does so, it updates the successful count and the last status message that is shown in CloudReactor, using the status updater library. It is scheduled to run daily.
+* *file_io* uses [non-persistent file storage](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-task-storage.html) to write and read numbers
+* *web_server* uses a python library dependency (Flask) to implement a web server and shows how to link an AWS Application Load Balancer (ALB) to a service. It requires that an ALB and target group be setup already, so it is not enabled by default.
+
+## Development workflow
+
+### Running the tasks locally
+
+The tasks are setup to be run with Docker Compose in `docker-compose.yml`. For example, you can build the Docker image that runs the tasks by typing:
+
+    docker-compose build
+
+(You only need to run this again when you change the dependencies required by 
+the project.)
+
+Then to run, say `task_1`, type:
+
+    docker-compose run --rm task_1
+
+Docker Compose is setup so that changes in the environment file `deploy/files/.env.dev`
+and the files in `src` will be available without rebuilding the image.
+
+### More development options
+
+See the [development guide](docs/development.md) for instructions on how to debug, 
+add dependencies, and run tests and checks.
+
+## Deploying your own tasks
+
+Now that you have deployed the example tasks, you can move your existing code to this
+project. You can add or modify tasks in `deploy/common.yml` to call the commands you want,
+with configuration for the schedule, retry parameters, and environment variables.
+Feel free to delete the tasks that you don't need, just by removing the top level keys
+in `task_name_to_config`.
+
+## Next steps
+
+* [Additional configuration](docs/configuration.md) options can be set or overridden
+* If you want to be alerted when task executions fail, setup an [Alert Method](docs/alerts.md)
+* To avoid leaking secrets (passwords, API keys, etc.), see the guide on [secret management](docs/secret_management.md)
+* For more secure networking, run your tasks on a [private subnet](docs/networking.md)
+* If you're having problems, see the [troubleshooting guide](docs/troubleshooting.md)
+
+## Contact us
+
+Hopefully, this example project has helped you get up and running with ECS and
+CloudReactor. Feel free to reach out to us at support@cloudreactor.io to setup 
+an account, or if you have any questions or issues!
