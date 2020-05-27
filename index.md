@@ -12,9 +12,8 @@ CloudReactor provides Dockerfiles and scripts that enable you to get up and runn
 
 [Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [Learn more about CloudReactor](./cloudreactor.html){: .btn .fs-5 .mb-4 .mb-md-0 }
 
-{: .mt-6}
 ## Table of contents
-{: .no_toc .text-delta }
+{: .no_toc .text-delta .mt-6 }
 
 1. TOC
 {:toc}

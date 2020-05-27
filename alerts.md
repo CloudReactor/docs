@@ -7,8 +7,6 @@ nav_order: 5
 # Alerts
 {: .no_toc}
 
-{: .mt-6}
-
 You can set up an Alert Method if you want to be alerted if task executions fail. An Alert Method links to one or more ways of sending notifications
 when certain events occur.
 
