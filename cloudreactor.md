@@ -1,8 +1,6 @@
 ---
 layout: default
-title: Why use CloudReactor?
+title: Why CloudReactor?
 nav_order: 2
 ---
-## Why use CloudReactor?
-
-why use cloudreactor?
+## Why CloudReactor?
