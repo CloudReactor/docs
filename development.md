@@ -4,8 +4,18 @@ title: Development
 nav_order: 3
 ---
 # Development
+{: .no_toc}
 
-## Running the tasks locally
+{: .mt-6}
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
+
+## Running tasks locally
 
 The tasks are setup to be run with Docker Compose in `docker-compose.yml`. For example, you can build the Docker image that runs the tasks by typing:
 
