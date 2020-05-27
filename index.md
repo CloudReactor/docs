@@ -176,6 +176,7 @@ We'll assume this is satisfactory. However, if you want to deploy natively -- pe
 {: .mt-5}
 - [x] Local repo configured with AWS and CloudReactor settings; tasks pushed to AWS ECS!
 
+---
 
 ## The example tasks
 
@@ -185,6 +186,8 @@ These tasks have the following behavior:
 * *task_1* prints 30 numbers and exits successfully. While it does so, it updates the "successful" count and the "last status message" that is shown in CloudReactor, using the CloudReactor status updater library. It is configured to run daily via `deploy/vars/common.yml`
 * *file_io* uses [non-persistent file storage](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-task-storage.html) to write and read numbers
 * *web_server* uses a python library dependency (Flask) to implement a web server and shows how to link an AWS Application Load Balancer (ALB) to a service. It requires that an ALB and target group be setup already, so it is not enabled by default.
+
+---
 
 ## Development workflow
 
@@ -203,10 +206,16 @@ Then to run, say `task_1`, type:
 Docker Compose is setup so that changes in the environment file `deploy/files/.env.dev`
 and the files in `src` will be available without rebuilding the image.
 
+---
+
+
 ### More development options
 
 See the [development guide](docs/development.md) for instructions on how to debug, 
 add dependencies, and run tests and checks.
+
+---
+
 
 ## Deploying your own tasks
 
@@ -228,6 +237,8 @@ Now that you have deployed the example tasks, you can move your existing code to
 ### Removing tasks
 You can delete any tasks you don't need (e.g. the example `task_1` and `file_io` tasks), just by removing the top level keys and associated configuration blocks below `task_name_to_config`. These tasks won't 
 
+---
+
 ## Next steps
 
 * [Additional configuration](docs/configuration.md) options can be set or overridden
@@ -235,6 +246,9 @@ You can delete any tasks you don't need (e.g. the example `task_1` and `file_io`
 * To avoid leaking secrets (passwords, API keys, etc.), see the guide on [secret management](docs/secret_management.md)
 * For more secure networking, run your tasks on a [private subnet](docs/networking.md)
 * If you're having problems, see the [troubleshooting guide](docs/troubleshooting.md)
+
+
+---
 
 ## Contact us
 
