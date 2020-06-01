@@ -44,7 +44,9 @@ For more details, see [AWS permissions required to deploy](docs/deployer_aws_per
 ### Set up a cluster in AWS ECS
 AWS provides a wizard that creates an ECS cluster in just a few steps. This is appropriate if you want to get started quickly. The wizard can optionally create a new VPC and new public subnets on that VPN -- but cannot create private subnets.
 
-To run the wizard, your account needs to have the permissions listed under ["Amazon ECS First Run Wizard Permissions" here](https://docs.aws.amazon.com/AmazonECS/latest/userguide/security_iam_id-based-policy-examples.html#first-run-permissions).
+Note that you may use other methods like [CloudFormation templates](https://github.com/aws-samples/ecs-refarch-cloudformation) or [Terraform templates](https://github.com/turnerlabs/terraform-ecs-fargate).
+
+We will continue with the AWS wizard. Note that when running the wizard, your user needs to have at least the permissions listed under ["Amazon ECS First Run Wizard Permissions" here](https://docs.aws.amazon.com/AmazonECS/latest/userguide/security_iam_id-based-policy-examples.html#first-run-permissions).
 
 The steps to run the wizard are:
 
@@ -62,7 +64,7 @@ AWS will create:
 - A cluster named as you chose on step 7 above.
 - A VPC named `ECS [cluster name] - VPC`
 - 2 subnets in the VPC named `ECS [cluster name] - Public Subnet 1` and `ECS [cluster name] - Public Subnet 2`.
-You can see these in VPC .. Subnets. Note that these subnets will be public, unless you selected existing (private) subnets above. If you haven't already, <span style="color: red">record the Subnet IDs</span>
+You can see these in VPC .. Subnets. Note that if you used the wizard to create a new VPC and subnets for you, these subnets will be public; if you want to use [private subnets](docs/networking.md), you'll have to create your own. If you haven't already, <span style="color: red">record the Subnet IDs</span>
 - A security group named `ECS staging - ECS Security Group` in the VPC. You can find it in `VPC .. Security Groups`. <span style="color: red">Record the Security Group ID</span>
 - Once you've recorded the Subnet IDs and Security Group IDs, under "ECS resource creation", you'll see `Cluster [the name of the cluster you created]`. Clicking this link will take you to the cluster's details page; <span style="color: red">record the `Cluster ARN`</span> you see here.
 
@@ -244,7 +246,7 @@ You can delete any tasks you don't need (e.g. the example `task_1` and `file_io`
 * [Additional configuration](docs/configuration.md) options can be set or overridden
 * If you want to be alerted when task executions fail, setup an [Alert Method](docs/alerts.md)
 * To avoid leaking secrets (passwords, API keys, etc.), see the guide on [secret management](docs/secret_management.md)
-* For more secure networking, run your tasks on a [private subnet](docs/networking.md)
+* For more secure [networking](docs/networking.md), run your tasks on private subnets and/or tighten your security groups.
 * If you're having problems, see the [troubleshooting guide](docs/troubleshooting.md)
 
 
