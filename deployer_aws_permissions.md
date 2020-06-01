@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Deployer AWS Permissions
+nav_order: 8
 ---
 # AWS permissions required to deploy
 
