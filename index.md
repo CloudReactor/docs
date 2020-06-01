@@ -35,7 +35,7 @@ Note that the AWS user credentials you use to deploy to AWS ECS must have permis
 1) Use an admin user or a power user with broad permissions; or
 2) Create a user and role with specific permissions for deployment; the [CloudReactor AWS deployer CloudFormation template](https://github.com/CloudReactor/aws-role-template) can help you create a user with the necessary permissions.
 
-For more details, see [AWS permissions required to deploy](./deployer_aws_permissions.md).
+For more details, see [AWS permissions required to deploy](docs/deployer_aws_permissions.md).
 {: .mb-6}
 
 
