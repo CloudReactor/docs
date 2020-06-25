@@ -21,120 +21,65 @@ CloudReactor provides Dockerfiles and scripts that enable you to get up and runn
 ---
 
 ## Getting Started
-Broadly speaking, we'll need to:
-- [Set up a cluster in AWS ECS](#set-up-a-cluster-in-aws-ecs) (this is where your tasks will be deployed to)
-- [(Optional) Set up AWS role permissions to allow CloudReactor to stop, start and schedule ECS tasks](#optional-set-aws-role-permissions-to-allow-cloudreactor-to-stop-start-and-schedule-ecs-tasks)
-- [(Optional) Configure CloudReactor with AWS ECS and AWS role settings](#optional-configure-cloudreactor-with-aws-ecs-and-aws-role-settings)
-- [Clone & configure the CloudReactor quickstart repo; deploy tasks!](#clone--configure-the-cloudreactor-quickstart-repo-deploy-tasks)
 
-Configuration will require some keys and other parameters to be entered. We'll note anything you need to record in  <span style="color: red">red</span> -- open up a text file to hold those variables as we go along.
 
-### Prerequisites: AWS user with deployment permissions
+### Set up AWS infrastructure, link to CloudReactor
+
+CloudReactor requires 3 things to be setup:
+1. Infrastructure to run tasks in your AWS environment ECS cluster, VPC, etc.
+2. A role in AWS that allows CloudReactor to schedule and manage tasks that you deploy
+3. Letting CloudReactor know what that role and other AWS settings is
+
+You might already have some of this set up (e.g. an ECS cluster, or a VPC) -- or you might not. Either way, we've created a [super easy AWS Setup Wizard](https://github.com/CloudReactor/cloudreactor-aws-setup-wizard) that can ensure you have everything you need. It takes < 15 minutes.
+
+Because the AWS Setup Wizard will be setting up ECS clusters, VPCs, subnets etc., you'll need Administrator user privileges to run it. The code behind the wizard can be inspected at the above link.
+
+If you don't want to use the Setup Wizard for some reason, you can refer to the [manual setup instructions](docs/manual_setup.md).
+
+--- 
+
+### Note: setting up an AWS user with deployment permissions
 {: .no_toc}
-Note that the AWS user credentials you use to deploy to AWS ECS must have permissions to deploy Docker images to ECR and to create tasks in ECS. You can either:
-1) Use an admin user or a power user with broad permissions; or
-2) Create a user and role with specific permissions for deployment; the [CloudReactor AWS deployer CloudFormation template](https://github.com/CloudReactor/aws-role-template) can help you create a user with the necessary permissions.
+Note that below, we'll be using AWS user credentials to deploy tasks to AWS ECS.
+
+The AWS user credentials we use must therefore have permissions to deploy Docker images to ECR and to create tasks in ECS. You can either:
+1. Use an admin user or a power user with broad permissions; or
+2. Create a user and role with specific permissions for deployment.
+
+If you're using an admin or power user, feel free to skip to the next step.
+
+If you want to create a new user and role, we've prepared a ["CloudReactor AWS deployer" CloudFormation template](https://github.com/CloudReactor/aws-role-template). In AWS, upload this to CloudFormation, and it will create a user with all the necessary permissions.
 
 For more details, see [AWS permissions required to deploy](docs/deployer_aws_permissions.md).
 {: .mb-6}
 
-
 ---
 
-### Set up a cluster in AWS ECS
-AWS provides a wizard that creates an ECS cluster in just a few steps. This is appropriate if you want to get started quickly. The wizard can optionally create a new VPC and new public subnets on that VPN -- but cannot create private subnets.
+### Deploy example tasks to AWS
+With the underlying infrastructure set-up, we can now go ahead and deploy tasks to AWS and have them managed by CloudReactor.
 
-Note that you may use other methods like [CloudFormation templates](https://github.com/aws-samples/ecs-refarch-cloudformation) or [Terraform templates](https://github.com/turnerlabs/terraform-ecs-fargate).
+We do this by providing a "quickstart" repo. The repo contains simple toy tasks, as well as scripts that enable easy deployment to AWS. You can replace these toy tasks with your own scripts.
 
-We will continue with the AWS wizard. Note that when running the wizard, your user needs to have at least the permissions listed under ["Amazon ECS First Run Wizard Permissions" here](https://docs.aws.amazon.com/AmazonECS/latest/userguide/security_iam_id-based-policy-examples.html#first-run-permissions).
-
-The steps to run the wizard are:
-
-1. Go to https://aws.amazon.com/ecs/getting-started/
-2. Click the `ECS console walkthrough` button (log into AWS if necessary)
-3. Change the region to your default AWS region
-4. Click the `Get started` button
-5. Choose the `nginx` container image and click the `Next` button
-6. On the next page, the defaults are sufficient, so hit `Next` again
-7. On the next page, name your cluster the desired name of your deployment environment -- for example `staging`. If you have an existing VPC and subnets you want to use to run your tasks, you can select them here. Otherwise, the console will create a new VPC and subnets for you.
-After entering your desired cluster name, hit `Next` again.
-8. On the next and final page, review your settings and hit the `Create` button. You'll see the status of the created resources on the next page. <span style="color: red">If you didn't choose existing subnets, record the subnet IDs</span>
-
-AWS will create:
-- A cluster named as you chose on step 7 above.
-- A VPC named `ECS [cluster name] - VPC`
-- 2 subnets in the VPC named `ECS [cluster name] - Public Subnet 1` and `ECS [cluster name] - Public Subnet 2`.
-You can see these in VPC .. Subnets. Note that if you used the wizard to create a new VPC and subnets for you, these subnets will be public; if you want to use [private subnets](docs/networking.md), you'll have to create your own. If you haven't already, <span style="color: red">record the Subnet IDs</span>
-- A security group named `ECS staging - ECS Security Group` in the VPC. You can find it in `VPC .. Security Groups`. <span style="color: red">Record the Security Group ID</span>
-- Once you've recorded the Subnet IDs and Security Group IDs, under "ECS resource creation", you'll see `Cluster [the name of the cluster you created]`. Clicking this link will take you to the cluster's details page; <span style="color: red">record the `Cluster ARN`</span> you see here.
-
-
-{: .mt-5}
-- [x] ECS cluster created!
-
----
-
-### (Optional) Set AWS role permissions to allow CloudReactor to stop, start and schedule ECS tasks
-To have CloudReactor manage your tasks in your AWS environment, you'll need to give CloudReactor permissions in AWS to run tasks, schedule tasks, create services, and trigger Workflows by deploying the [CloudReactor AWS CloudFormation template](https://github.com/CloudReactor/aws-role-template), named `cloudreactor-aws-role-template.json`.
-
-Follow the instructions in the [README.md](https://github.com/CloudReactor/aws-role-template/blob/master/README.md#allowing-cloudreactor-to-manage-your-tasks), in the section "Allowing CloudReactor to manage your tasks".
-
-<span style="color: red">Be sure to record the ```ExternalID```, ```CloudreactorRoleARN```, ```TaskExecutionRoleARN```, ```WorkflowStarterARN```, and ```WorkflowStarterAccessKey``` values.</span>
-
-
-{: .mt-5}
-- [x] AWS role permissions created for CloudReactor!
-
-
----
-
-### (Optional) Configure CloudReactor with AWS ECS and AWS role settings
-Contact us at support@cloudreactor.io and we'll create an account for you and give you an API key.
-
-Then login to the [CloudReactor dashboard](https://dash.cloudreactor.io/). We'll create a Run Environment in CloudReactor; a Run Environment contains settings that tell CloudReactor how to run tasks in AWS.
-
-1. Click on "Run Environments", then "Add Environment"
-2. Name your environment (e.g. "staging", "production"). You may want to keep the name in all lowercase letters without spaces or symbols besides "-" and "_", so that filenames and command-lines you'll use later will be sane. <span style="color: red">Note the exact name of your Run Environment</span>, as you'll need this later.
-3. Fill in your AWS account ID and default region. Your AWS account ID is a 12-digit number that you can find by clicking "Support" then "Support Center". For default region, select the region that you want CloudReactor to run tasks / workflows in (e.g.`us-west-2`).
-4. For `Assumable Role ARN` fill in the value of `CloudreactorRoleARN` from the output of the CloudFormation stack.
-5. For `External ID`, use the same External ID you entered when you created the CloudFormation stack.
-6. For `Workflow Starter Lambda ARN`, fill in the value of `WorkflowStarterARN` from the output of the CloudFormation stack.
-7. For `Workflow Starter Access Key`, fill in the value of `WorkflowStarterAccessKey` from the output of the CloudFormation stack.
-8. Add the subnets and security group created by the ECS getting started wizard above
-9. Under AWS ECS Settings, choose a `Default Launch Type` of `Fargate` and check FARGATE under Supported Launch Types.
-10. For `Default Cluster ARN`, fill in the `Cluster ARN` of the ECS cluster you created above
-11. For `Default Execution Role` and `Default Task Role`, fill in the value of `TaskExecutionRoleARN` from the output of the CloudFormation stack.
-12. Click on the `Save` button
-
-
-{: .mt-5}
-- [x] CloudReactor configured to run tasks in ECS!
-
----
-
-### Clone & configure the CloudReactor quickstart repo; deploy example tasks!
-This repo contains everything you need to deploy tasks immediately to AWS, and have these tasks orchestrated, monitored and managed by CloudReactor. The repo contains simple toy tasks that are pushed to ECS below.
-
-First, you'll need to get this project's source code onto a filesystem where you can make changes. You can either clone this project directly, or fork it first, then clone it.
-
-If cloning directly:
+First, fork [this repo](https://github.com/CloudReactor/cloudreactor-ecs-quickstart.git). Then, once forked, clone it
 
 ```
-git clone https://github.com/CloudReactor/cloudreactor-ecs-quickstart.git
+git clone [https://github.com/link to the forked repo]
 ```
 
-This repo contains a Dockerfile (container) that has all the dependencies (python, ansible, aws-cli etc.) required to build and deploy your tasks. We will build this container, and use it to deploy tasks from your local machine. This is the most straightforward way to configure and deploy, since:
+This repo contains a Dockerfile (container) that has all the dependencies (python, ansible, aws-cli etc.) required to build and deploy your tasks. Our next step is to build this "local" container, and then use it to deploy tasks from your local machine. This is the most straightforward way to configure and deploy, since:
 - you don't need to have python installed directly on your machine
 - you don't need to add another set of dependencies to your libraries
 - you can deploy irrespective of your OS (e.g. if you're running Windows).
 
-You can also use this method on an EC2 instance that has an instance profile containing a role that has permissions to create ECS tasks. When deploying, the AWS CLI in the container will use the temporary access key associated with the role assigned to the EC2 instance.
+Note: You can also use this method on an EC2 instance that has an instance profile containing a role that has permissions to create ECS tasks. When deploying, the AWS CLI in the container will use the temporary access key associated with the role assigned to the EC2 instance.
 
-We'll assume this is satisfactory. However, if you want to deploy natively -- perhaps you have Python installed (possibly in a VM), and you want to use Python directly to deploy -- see [this section](#).
+However, if you want to deploy natively -- perhaps you have Python installed (possibly in a VM), and you want to use Python directly to deploy -- see [this section](#).
 
-1. Ensure you have Docker running locally, and have installed [Docker Compose](https://docs.docker.com/compose/install/).
+Otherwise, let's continue:
+
+1. Install [Docker Compose](https://docs.docker.com/compose/install/) and run (if running Windows or Mac, Docker Desktop includes Docker Compose)
 2. **AWS configuration:** Copy `deploy/docker_deploy.env.example` to `deploy/docker_deploy.env`
-    - fill in your `AWS access key`, `access key secret`, and `default region`
+    - Fill in your `AWS access key`, `access key secret`, and `default region`. The AWS keys used here must be for a user with privileges to deploy tasks to AWS ECS, as mentioned above.
     - The access key and secret should be for the AWS user you plan on using to deploy with, possibly created above in [Prerequisites: AWS user with deployment permissions](#prerequisites-aws-user-with-deployment-permissions).
     - You may also populate this file with a script you write yourself, for example with something that uses the AWS CLI to assume a role and gets temporary credentials.
     - If you are running this on an EC2 instance with an instance profile that has deployment permissions, you can leave this file blank.
@@ -175,19 +120,20 @@ We'll assume this is satisfactory. However, if you want to deploy natively -- pe
     ```
     These commands will take you to a bash shell inside the deployer Docker container where you can re-run the deployment script with `./deploy.sh` and inspect the files it produces in the `build/` directory.
 
-{: .mt-5}
-- [x] Local repo configured with AWS and CloudReactor settings; tasks pushed to AWS ECS!
-
 ---
 
 ## The example tasks
 
-Successfully deploying this example project will create two ECS tasks. These tasks are defined in the `./src` folder, and are `task_1.py` and `file_io.py`. These tasks are configured in `deploy/vars/common.yml`.
+Successfully deploying this example project will push two ECS tasks to AWS. You can log into [CloudReactor](https://dash.cloudreactor.io) to see these tasks.
+
+The code for each tasks is in the `./src` folder, i.e. `./src/task_1.py` and `./src/file_io.py`. Feel free to take a look.
+
+Next, open `./deploy/vars/common.yml` -- you'll see entries for both `task_1` and `file_io`. You can think of this as a manifest of tasks to push to ECS; the CloudReactor deployment script you just ran will look for the files defined here, push them to ECS, and register them with CloudReactor.
 
 These tasks have the following behavior:
 * *task_1* prints 30 numbers and exits successfully. While it does so, it updates the "successful" count and the "last status message" that is shown in CloudReactor, using the CloudReactor status updater library. It is configured to run daily via `deploy/vars/common.yml`
 * *file_io* uses [non-persistent file storage](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-task-storage.html) to write and read numbers
-* *web_server* uses a python library dependency (Flask) to implement a web server and shows how to link an AWS Application Load Balancer (ALB) to a service. It requires that an ALB and target group be setup already, so it is not enabled by default.
+* *web_server* uses a python library dependency (Flask) to implement a web server and shows how to link an AWS Application Load Balancer (ALB) to a service. It requires that an ALB and target group be setup already, so it is not enabled by default (i.e. is commented out in the `./deploy/vars/common.yml` file).
 
 ---
 
