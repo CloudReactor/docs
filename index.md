@@ -154,6 +154,21 @@ Then to run, say `task_1`, type:
 Docker Compose is setup so that changes in the environment file `deploy/files/.env.dev`
 and the files in `src` will be available without rebuilding the image.
 
+When ready to deploy, as before:
+
+- In a bash shell, run:
+
+    ```
+    ./docker_deploy.sh <environment> [task_name]
+    ```
+
+- In a Windows command prompt, run:
+    ```
+    docker_deploy <environment>  [task_names]
+    ```
+
+`task_names` is optional; if omitted, all tasks defined in `./deploy/vars/common.yml` will be pushed.
+
 ---
 
 
@@ -183,7 +198,20 @@ Now that you have deployed the example tasks, you can move your existing code to
     - Additional parameters include the run schedule (cron expression), retry parameters, and environment variables. See [additional configuration](docs/configuration.md).
 
 ### Removing tasks
-You can delete any tasks you don't need (e.g. the example `task_1` and `file_io` tasks), just by removing the top level keys and associated configuration blocks below `task_name_to_config`. These tasks won't 
+Delete tasks within the [CloudReactor dashboard](https://dash.cloudreactor.io). This will remove the task from AWS also.
+
+You should also remove the reference to the tasks (and maybe the task code itself if you want) in `./deploy/vars/common.yml`. If you don't, if you run `./docker_deploy.sh [environment]` (without task names), this will (re-)push all tasks -- which might include tasks you had intended to remove.
+
+For example, if you want to delete the `task_1` task, open `./deploy/vars/common.yml` and delete the entire `task_1:` code block i.e.:
+
+task_1:
+<<: *default_task_config
+description: "This description shows up in CloudReactor dashboard"
+command: "python src/task_1.py"
+schedule: cron(9 15 * * ? *)
+wrapper:
+    <<: *default_task_wrapper
+    enable_status_updates: true
 
 ---
 
