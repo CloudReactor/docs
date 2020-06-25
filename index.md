@@ -186,13 +186,13 @@ add dependencies, and run tests and checks.
 Now that you have deployed the example tasks, you can move your existing code to this project. To add your own task:
 1. Place task code itself in a new file in `./src`, e.g. `new_task.py`
 2. Add a configuration block for the task in `deploy/vars/common.yml`, below `task_name_to_config:` A minimal configuration block is:
-    <div class="code-example" markdown="1">
-    ```python
-    new_task:
-        <<: *default_task_config
-        command: "python src/new_task.py"
-    ```
-    </div>
+    
+```python
+new_task:
+    <<: *default_task_config
+    command: "python src/new_task.py"
+```
+
     - `<<: *default_task_config` allows new_task to inherit properties from the default task configuration
     - `command: "python src/new_task.py"` contains the command to run (in this case, to execute new_task via python)
     - Additional parameters include the run schedule (cron expression), retry parameters, and environment variables. See [additional configuration](docs/configuration.md).
