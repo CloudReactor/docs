@@ -25,8 +25,8 @@ CloudReactor provides Dockerfiles and scripts that enable you to get up and runn
 
 ### Set up AWS infrastructure, link to CloudReactor
 
-CloudReactor requires 3 things to be setup:
-1. Infrastructure to run tasks in your AWS environment ECS cluster, VPC, etc.
+First, we have to set up the serverless AWS infrastructure (ECS) where your tasks will run, and link it to CloudReactor. More specifically:
+1. Infrastructure to run tasks in your AWS environment: ECS cluster, VPC, etc.
 2. A role in AWS that allows CloudReactor to schedule and manage tasks that you deploy
 3. Letting CloudReactor know what that role and other AWS settings is
 
