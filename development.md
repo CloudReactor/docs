@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Development
+title: Developing with CloudReactor
 nav_order: 3
 ---
 
