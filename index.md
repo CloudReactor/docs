@@ -204,6 +204,7 @@ You should also remove the reference to the tasks (and maybe the task code itsel
 
 For example, if you want to delete the `task_1` task, open `./deploy/vars/common.yml` and delete the entire `task_1:` code block i.e.:
 
+```python
 task_1:
 <<: *default_task_config
 description: "This description shows up in CloudReactor dashboard"
@@ -212,6 +213,7 @@ schedule: cron(9 15 * * ? *)
 wrapper:
     <<: *default_task_wrapper
     enable_status_updates: true
+```
 
 ---
 
