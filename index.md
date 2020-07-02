@@ -62,7 +62,7 @@ With the underlying infrastructure set-up, we can now go ahead and deploy tasks 
 
 We do this by providing a "quickstart" repo. The repo contains simple toy tasks, as well as scripts that enable easy deployment to AWS. You can replace these toy tasks with your own scripts.
 
-First, fork [this repo](https://github.com/CloudReactor/cloudreactor-ecs-quickstart.git). Then, once forked, clone it
+**First, fork [this repo](https://github.com/CloudReactor/cloudreactor-ecs-quickstart.git). Then, once forked, clone it locally:**
 
 ```
 git clone [https://github.com/link to the forked repo]
@@ -77,9 +77,9 @@ Note: You can also use this method on an EC2 instance that has an instance profi
 
 However, if you want to deploy natively -- perhaps you have Python installed (possibly in a VM), and you want to use Python directly to deploy -- see [this section](#).
 
-Otherwise, let's continue:
+**Otherwise, let's continue:**
 
-1. Install [Docker Compose](https://docs.docker.com/compose/install/) and run (if running Windows or Mac, Docker Desktop includes Docker Compose)
+1. Install [Docker Compose](https://docs.docker.com/compose/install/). Once installed, run it (if using Windows or Mac, the "Docker Desktop" installation includes Docker Compose, so just install / run that)
 2. **AWS configuration:** Copy `deploy/docker_deploy.env.example` to `deploy/docker_deploy.env`
     - Fill in your `AWS access key`, `access key secret`, and `default region`. The AWS keys used here must be for a user with privileges to deploy tasks to AWS ECS, as mentioned above.
     - The access key and secret should be for the AWS user you plan on using to deploy with, possibly created above in [Prerequisites: AWS user with deployment permissions](#prerequisites-aws-user-with-deployment-permissions).
