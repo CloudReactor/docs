@@ -32,7 +32,7 @@ First, we have to set up the serverless AWS infrastructure (ECS) where your task
 
 You might already have some of this set up (e.g. an ECS cluster, or a VPC) -- or you might not. Either way, we've created a [super easy AWS Setup Wizard](https://github.com/CloudReactor/cloudreactor-aws-setup-wizard) that can ensure you have everything you need. It takes < 15 minutes.
 
-Because the AWS Setup Wizard will be setting up ECS clusters, VPCs, subnets etc., you'll need to run it with Administrator user privileges. The code behind the wizard can be inspected at the above link.
+Because the AWS Setup Wizard will be setting up ECS clusters, VPCs, subnets etc., you'll need to run it with AWS Administrator user privileges. The code behind the wizard can be inspected at the above link.
 
 If you don't want to use the Setup Wizard for some reason, you can refer to the [manual setup instructions](docs/manual_setup.md).
 
@@ -42,15 +42,15 @@ If you don't want to use the Setup Wizard for some reason, you can refer to the 
 
 ### Note: setting up an AWS user with deployment permissions
 {: .no_toc}
-Note that below, we'll be using AWS user credentials to deploy tasks to AWS ECS.
+Note that below, we'll be using an AWS user to deploy tasks to AWS ECS.
 
-The AWS user credentials we use must therefore have permissions to deploy Docker images to ECR and to create tasks in ECS. You can either:
+This AWS user must have permissions to deploy Docker images to ECR and to create tasks in ECS. You can either:
 1. Use an admin user or a power user with broad permissions; or
 2. Create a user and role with specific permissions for deployment.
 
-If you're using an admin or power user, feel free to skip to the next step.
+**If you're using an admin or power user, feel free to skip to the next step.**
 
-If you want to create a new user and role, we've prepared a ["CloudReactor AWS deployer" CloudFormation template](https://github.com/CloudReactor/aws-role-template). In AWS, upload this to CloudFormation, and it will create a user with all the necessary permissions.
+However, if you want to create a new user and role, we've prepared a ["CloudReactor AWS deployer" CloudFormation template](https://github.com/CloudReactor/aws-role-template) with all the necessary permissions. In AWS, select the CloudFormation service, and upload this template. It will create a user with all the necessary permissions (**and output user credentials -- save these for use later!**).
 
 For more details, see [AWS permissions required to deploy](docs/deployer_aws_permissions.md).
 {: .mb-6}
