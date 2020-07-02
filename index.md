@@ -32,9 +32,11 @@ First, we have to set up the serverless AWS infrastructure (ECS) where your task
 
 You might already have some of this set up (e.g. an ECS cluster, or a VPC) -- or you might not. Either way, we've created a [super easy AWS Setup Wizard](https://github.com/CloudReactor/cloudreactor-aws-setup-wizard) that can ensure you have everything you need. It takes < 15 minutes.
 
-Because the AWS Setup Wizard will be setting up ECS clusters, VPCs, subnets etc., you'll need Administrator user privileges to run it. The code behind the wizard can be inspected at the above link.
+Because the AWS Setup Wizard will be setting up ECS clusters, VPCs, subnets etc., you'll need to run it with Administrator user privileges. The code behind the wizard can be inspected at the above link.
 
 If you don't want to use the Setup Wizard for some reason, you can refer to the [manual setup instructions](docs/manual_setup.md).
+
+**Either run the wizard, or complete manual setup, before moving to the next step**.
 
 --- 
 
