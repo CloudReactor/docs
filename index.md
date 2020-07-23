@@ -3,11 +3,11 @@ layout: default
 title: Home
 nav_order: 1
 ---
-# Easily create, deploy, orchestrate and manage tasks in AWS
+# Easy serverless workflow automation
 {: .no_toc }
 {: .fs-10 }
 
-CloudReactor provides Dockerfiles and scripts that enable you to get up and running with a local Python development environment, deploy code seamlessly to your AWS environment, and monitor, manage and orchestrate deployed tasks with CloudReactor -- all in record time and with a minimum of fuss.
+Deploy tasks with a single command to AWS ECS. Monitor, manage and orchestrate tasks with CloudReactor's easy-to-use dashboard.
 {: .fs-4 .fw-300 }
 
 [Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [Learn more about CloudReactor](./cloudreactor.html){: .btn .fs-5 .mb-4 .mb-md-0 }
@@ -25,14 +25,18 @@ CloudReactor provides Dockerfiles and scripts that enable you to get up and runn
 
 ### Set up AWS infrastructure, link to CloudReactor
 
-First, we have to set up the serverless AWS infrastructure (ECS) where your tasks will run, and link it to CloudReactor. More specifically:
+First, we have to set up the serverless AWS infrastructure (ECS) where your tasks will run, and link it to CloudReactor.
+
+Here are the key pieces required:
 1. Infrastructure to run tasks in your AWS environment: ECS cluster, VPC, etc.
 2. A role in AWS that allows CloudReactor to schedule and manage tasks that you deploy
 3. Letting CloudReactor know what that role and other AWS settings is
 
-You might already have some of this set up (e.g. an ECS cluster, or a VPC) -- or you might not. Either way, we've created a [super easy AWS Setup Wizard](https://github.com/CloudReactor/cloudreactor-aws-setup-wizard) that can ensure you have everything you need. It takes < 15 minutes.
+You might already have some of this set up (e.g. an ECS cluster, or a VPC) -- or you might not.
 
-Because the AWS Setup Wizard will be setting up ECS clusters, VPCs, subnets etc., you'll need to run it with AWS Administrator user privileges. The code behind the wizard can be inspected at the above link.
+Either way, we've created a [super easy AWS Setup Wizard](https://github.com/CloudReactor/cloudreactor-aws-setup-wizard) that ensures you have all the above set up. It takes < 15 minutes.
+
+Because the AWS Setup Wizard will be setting up ECS clusters, VPCs, subnets etc., <strong>you'll need to run it with AWS Administrator user privileges</strong>. The code behind the wizard can be inspected at the above link.
 
 If you don't want to use the Setup Wizard for some reason, you can refer to the [manual setup instructions](docs/manual_setup.md).
 
