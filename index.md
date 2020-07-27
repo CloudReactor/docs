@@ -71,7 +71,7 @@ For more details, see [AWS permissions required to deploy](/deployer_aws_permiss
 ### Deploy example tasks to AWS
 With the underlying infrastructure set-up, we can now go ahead and deploy tasks to AWS and have them managed by CloudReactor.
 
-We do this by providing a "quickstart" repo. The repo contains command-line tools that enable easy deployment to AWS, and simple, illustrative tasks (e.g. tasks that print numbers). You can replace these toy tasks with your own scripts.
+We do this by providing a "quickstart" repo. The repo contains the command-line tools that enable easy deployment to AWS, and simple toy tasks that illustrate features of CloudReactor.
 
 1. Fork [the quickstart repo](https://github.com/CloudReactor/cloudreactor-ecs-quickstart.git){:target="_blank"}. Then, once forked, clone it locally. (if you don't use GitHub, feel free to just clone; you just may want to check in every now and then see if there is an updated repo available):
 ```
