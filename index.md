@@ -131,7 +131,7 @@ git clone [https://github.com/link_to_your_forked_repo]
 
     If you encounter issues, see the [troubleshooting guide](/troubleshooting.md){:target="_blank"}.
 
-7. Log into [dash.cloudreactor.io](https://www.cloudreactor.io){:target="_blank"}. You should see the two example tasks listed there. You can manually start and stop these tasks, or schedule them to run. They'll run on the AWS ECS infrastructure we created earlier.
+7. Log into [dash.cloudreactor.io](https://dash.cloudreactor.io){:target="_blank"}. You should see the two example tasks listed there. You can manually start and stop these tasks, or schedule them to run. They'll run on the AWS ECS infrastructure we created earlier.
 
 ---
 
@@ -235,7 +235,7 @@ You should also remove the reference to the tasks in `./deploy/vars/common.yml`.
 You may also want to remove the task code itself from `/src/`
 
 For example, if you want to delete the `task_1` task:
-1. In [dash.cloudreactor.io](https://www.cloudreactor.io){:target="_blank"}, hit the delete icon next to `task_1` and hit "confirm".
+1. In [dash.cloudreactor.io](https://dash.cloudreactor.io){:target="_blank"}, hit the delete icon next to `task_1` and hit "confirm".
 2. Open `./deploy/vars/common.yml` and delete the entire `task_1:` code block i.e.:
 
     ```python
