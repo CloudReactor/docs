@@ -10,7 +10,7 @@ nav_order: 1
 Deploy tasks with a single command to AWS ECS. Monitor, manage and orchestrate tasks with CloudReactor's easy-to-use dashboard.
 {: .fs-4 .fw-300 }
 
-[Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [Learn more about CloudReactor](./cloudreactor.html){: .btn .fs-5 .mb-4 .mb-md-0 }
+[Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [Learn more about CloudReactor](/cloudreactor.html){:target="_blank"}{: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ## Table of contents
 {: .no_toc .text-delta .mt-6 }
@@ -22,41 +22,48 @@ Deploy tasks with a single command to AWS ECS. Monitor, manage and orchestrate t
 
 ## Getting Started
 
-
 ### Set up AWS infrastructure, link to CloudReactor
 
-First, we have to set up the serverless AWS infrastructure (ECS) where your tasks will run, and link it to CloudReactor.
+First, we have to select or setup the serverless AWS infrastructure where your tasks will run, and link that infrastructure with CloudReactor.
 
-Here are the key pieces required:
-1. Infrastructure to run tasks in your AWS environment: ECS cluster, VPC, etc.
-2. A role in AWS that allows CloudReactor to schedule and manage tasks that you deploy
-3. Letting CloudReactor know what that role and other AWS settings is
+1. From the Docker website, download and install [Docker Desktop](https://www.docker.com/products/docker-desktop){:target="_blank"} (macOS or Windows) or [Docker Compose](https://docs.docker.com/compose/install/){:target="_blank"} (Linux). Once installed, start Docker.
 
-You might already have some of this set up (e.g. an ECS cluster, or a VPC) -- or you might not.
+2. In a temporary directory, clone our [AWS Setup Wizard](https://github.com/CloudReactor/cloudreactor-aws-setup-wizard){:target="_blank"}:
+```
+git clone https://github.com/CloudReactor/cloudreactor-aws-setup-wizard.git
+```
 
-Either way, we've created a [super easy AWS Setup Wizard](https://github.com/CloudReactor/cloudreactor-aws-setup-wizard) that ensures you have all the above set up. It takes < 15 minutes.
+3. cd into the cloned repo, run `./build.sh` to build the wizard and then `.wizard.sh` to run:
+```
+cd cloudreactor-aws-setup-wizard
+./build.sh
+./wizard.sh (or .\wizard.bat if using Windows)
+```
 
-Because the AWS Setup Wizard will be setting up ECS clusters, VPCs, subnets etc., <strong>you'll need to run it with AWS Administrator user privileges</strong>. The code behind the wizard can be inspected at the above link.
+4. Go through the wizard. The wizard will ask "What do you want to name your Run Environment?" -- this is a name used in CloudReactor to refer to the infrastructure you're setting up. If you're setting up a cluster to run production or staging tasks, you might call this "production" or "staging" respectively for example. **Remember this name for use later.**
 
-If you don't want to use the Setup Wizard for some reason, you can refer to the [manual setup instructions](docs/manual_setup.md).
+The AWS Setup Wizard will let you select a region, ECS cluster, VPC, subnet, etc. for CloudReactor to use. If any of those pieces don't exist, it can create them for you.
+
+Because the wizard automates the creation of resources in AWS, it will ask for your AWS user credentials. <strong>We strongly recommend providing it with an AWS Administrator user</strong>. The code behind the wizard is publicly viewable on GitHub: [https://github.com/CloudReactor/cloudreactor-aws-setup-wizard](https://github.com/CloudReactor/cloudreactor-aws-setup-wizard){:target="_blank"}.
+
+If you don't want to use the Setup Wizard for some reason, you can refer to the [manual setup instructions](/manual_setup.md){:target="_blank"} -- but note that setting up each piece of infrastructure manually will be time-consuming and error-prone.
 
 **Either run the wizard, or complete manual setup, before moving to the next step**.
 
 --- 
 
-### Note: setting up an AWS user with deployment permissions
-{: .no_toc}
-Note that below, we'll be using an AWS user to deploy tasks to AWS ECS.
+### Optional: setting up a new AWS user with deployment permissions
+CloudReactor needs to be configured with AWS credentials that allow it to deploy Docker images to AWS ECR and create tasks in ECS on your behalf.
 
-This AWS user must have permissions to deploy Docker images to ECR and to create tasks in ECS. You can either:
+You can either:
 1. Use an admin user or a power user with broad permissions; or
 2. Create a user and role with specific permissions for deployment.
 
 **If you're using an admin or power user, feel free to skip to the next step.**
 
-However, if you want to create a new user and role, we've prepared a ["CloudReactor AWS deployer" CloudFormation template](https://github.com/CloudReactor/aws-role-template) with all the necessary permissions. In AWS, select the CloudFormation service, and upload this template. It will create a user with all the necessary permissions (**and output user credentials -- save these for use later!**).
+If you want to use a new user and role, we've prepared a ["CloudReactor AWS deployer" CloudFormation template](https://github.com/CloudReactor/aws-role-template){:target="_blank"}. Feel free to inspect the template. When ready, log into the AWS management console, select the CloudFormation service, and upload this template. It will create a user with all the necessary permissions. **When CloudFormation outputs user credentials, save these for use later!**).
 
-For more details, see [AWS permissions required to deploy](docs/deployer_aws_permissions.md).
+For more details, see [AWS permissions required to deploy](/deployer_aws_permissions.md){:target="_blank"}.
 {: .mb-6}
 
 ---
@@ -64,34 +71,33 @@ For more details, see [AWS permissions required to deploy](docs/deployer_aws_per
 ### Deploy example tasks to AWS
 With the underlying infrastructure set-up, we can now go ahead and deploy tasks to AWS and have them managed by CloudReactor.
 
-We do this by providing a "quickstart" repo. The repo contains simple toy tasks, as well as scripts that enable easy deployment to AWS. You can replace these toy tasks with your own scripts.
+We do this by providing a "quickstart" repo. The repo contains command-line tools that enable easy deployment to AWS, and simple, illustrative tasks (e.g. tasks that print numbers). You can replace these toy tasks with your own scripts.
 
-**First, fork [this repo](https://github.com/CloudReactor/cloudreactor-ecs-quickstart.git). Then, once forked, clone it locally:**
-
+1. Fork [the quickstart repo](https://github.com/CloudReactor/cloudreactor-ecs-quickstart.git){:target="_blank"}. Then, once forked, clone it locally. (if you don't use GitHub, feel free to just clone; you just may want to check in every now and then see if there is an updated repo available):
 ```
-git clone [https://github.com/link to the forked repo]
+git clone [https://github.com/link_to_your_forked_repo]
 ```
 
-This repo contains a Dockerfile (container) that has all the dependencies (python, ansible, aws-cli etc.) required to build and deploy your tasks. Our next step is to build this "local" container, and then use it to deploy tasks from your local machine. This is the most straightforward way to configure and deploy, since:
-- you don't need to have python installed directly on your machine
-- you don't need to add another set of dependencies to your libraries
-- you can deploy irrespective of your OS (e.g. if you're running Windows).
-
-Note: You can also use this method on an EC2 instance that has an instance profile containing a role that has permissions to create ECS tasks. When deploying, the AWS CLI in the container will use the temporary access key associated with the role assigned to the EC2 instance.
-
-However, if you want to deploy natively -- perhaps you have Python installed (possibly in a VM), and you want to use Python directly to deploy -- see [this section](#).
-
-**Otherwise, let's continue:**
-
-1. Install [Docker Compose](https://docs.docker.com/compose/install/). Once installed, run it (if using Windows or Mac, the "Docker Desktop" installation includes Docker Compose, so just install / run that)
-2. **AWS configuration:** Copy `deploy/docker_deploy.env.example` to `deploy/docker_deploy.env`
-    - Fill in your `AWS access key`, `access key secret`, and `default region`. The AWS keys used here must be for a user with privileges to deploy tasks to AWS ECS, as mentioned above.
-    - The access key and secret should be for the AWS user you plan on using to deploy with, possibly created above in [Prerequisites: AWS user with deployment permissions](#prerequisites-aws-user-with-deployment-permissions).
+2. In your favorite code editor, copy `deploy/docker_deploy.env.example` to `deploy/docker_deploy.env`. Open this file and fill in your `AWS access key`, `access key secret`, and `default region`.
+    - **The AWS keys used here must be for a user with privileges to deploy tasks to AWS ECS.** As mentioned [above](#note-setting-up-an-aws-user-with-deployment-permissions), you could use an Admin or power user, or create a new user specifically for deployment via CloudReactor.
     - You may also populate this file with a script you write yourself, for example with something that uses the AWS CLI to assume a role and gets temporary credentials.
     - If you are running this on an EC2 instance with an instance profile that has deployment permissions, you can leave this file blank.
-3. **CloudReactor configuration:** Copy `deploy/vars/example.yml` to `deploy/vars/<environment>.yml`, where `<environment>` is the name of the Run Environment created in CloudReactor above (e.g. `staging`, `production`)
-    - Open the .yml file you just created, and enter your CloudReactor API key next to `api_key`; or, if you're not using CloudReactor, set `enabled: false` instead
-4. Build the Docker container that will deploy the project.
+
+3. Copy `deploy/vars/example.yml` to `deploy/vars/<environment>.yml`, where `<environment>` is the name of the Run Environment created in CloudReactor [earlier](#set-up-aws-infrastructure-link-to-cloudreactor) (e.g. `staging`, `production`)
+    - Open the .yml file you just created, and enter your **CloudReactor API key** next to `api_key`
+    - If you're not using CloudReactor (i.e. you just want to use our tools to deploy to AWS, but don't want to manage tasks with CloudReactor): set `enabled: false` instead
+
+4. Ensure Docker is running (you should have installed it [above](#set-up-aws-infrastructure-link-to-cloudreactor)). Deployment with Docker is highly recommended because:
+    - you don't need to have python installed directly on your machine
+    - you don't need to add another set of dependencies to your libraries
+    - you can deploy irrespective of your OS (e.g. if you're running Windows).
+    
+    If you don't want to use Docker, you'll need to set up your local environment to deploy natively. This requires installing python and various dependencies. See [this section](#){:target="_blank"} for details, and skip steps 5 & 6 below.
+
+5. Build the Docker container that will deploy the project. This may take a few minutes to complete so be ready to make some tea / coffee while you wait.
+
+    Replace `<environment>` below with the name of the Run Environment and .yml file created immediately above (e.g. "staging", "production").
+
     - In a bash shell, run:
     ```
     ./docker_build_deployer.sh <environment>
@@ -101,64 +107,102 @@ However, if you want to deploy natively -- perhaps you have Python installed (po
     ```
     docker_build_deployer <environment>
     ```
-    `<environment>` is a required argument, which is the name of the Run Environment and .yml file created immediately above.
     
-    This step is only necessary once, unless you add additional configuration to `deploy/Dockerfile`.
-5. With the deployment container created, we can deploy the tasks
+    Running `docker_build_deployer` is only necessary once, unless you add additional configuration to `deploy/Dockerfile`.
+
+6. Deploy the example tasks to AWS.
+
+    This will push two toy tasks to AWS and register them with CloudReactor. Successfully pushing these tasks to AWS confirms that setup is complete. The tasks can be easily deleted later.
+    
+    The code for each tasks is in the `./src` folder, i.e. `./src/task_1.py` and `./src/file_io.py`. Feel free to take a look; they're simple toy tasks that illustrate some features of CloudReactor / ECS.
+    - *task_1* prints 30 numbers and exits successfully. While it does so, it updates the "successful" count and the "last status message" that is shown in CloudReactor, using the CloudReactor status updater library.
+    - *file_io* uses [non-persistent file storage](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-task-storage.html){:target="_blank"} to write and read numbers.
+
+    Again, replace `<environment>` below with the name of the Run Environment you're deploying to. `[task_names]` is an **optional** argument, which is a comma-separated list of tasks to be deployed e.g. `task_1, file_io`. If `[task_names]` is omitted, all tasks will be deployed.
+
     - In a bash shell, run:
     ```
     ./docker_deploy.sh <environment> [task_name]
     ```
     - In a Windows command prompt, run:
     ```
-    docker_deploy <environment>  [task_names]
+    docker_deploy <environment> [task_names]
     ```
-    In both of these commands, `<environment>` is a required argument, which is the name of the Run Environment. `[task_names]` is an optional argument, which is a comma-separated list of tasks to be deployed. In this project, this can be one or more of `task_1`, `file_io`, etc, separated by commas. If `[task_names]` is omitted, all tasks will be deployed.
+
+    If you encounter issues, see the [troubleshooting guide](/troubleshooting.md){:target="_blank"}.
+
+7. Log into [dash.cloudreactor.io](https://www.cloudreactor.io){:target="_blank"}. You should see the two example tasks listed there. You can manually start and stop these tasks, or schedule them to run. They'll run on the AWS ECS infrastructure we created earlier.
+
+---
+
+## Development workflow: adding your own tasks
+
+### Add task code
+
+1. Place task code itself in a new file in `./src`, e.g. `new_task.py`
+
+Add any dependencies to `/requirements.in`. For example:
+```
+psycopg2==2.8.5
+```
+
+### Run & test tasks locally
+
+If this is the first time running the task locally, run:
+
+```
+docker-compose run --rm pip-compile
+docker-compose build
+```
+- **docker-compose run --rm pip-compile**: this generates a new `requirements.txt` (used by Docker Compose) from `/requirements.in`
+- **docker-compose build**: this builds the container
+
+Then to run e.g. `new_task`, type:
+```
+docker-compose run --rm new_task
+```
+
+**You do not need to run `docker-compose build` each time you make changes to `new_task`.** Changes in the environment file `deploy/files/.env.dev` and any files in `/src` will be updated automatically.
+
+You only need to run `docker-compose run --rm pip-compile` and `docker-compose build` if you need to update dependencies due to requirements.in being changed.
+
+### Add task to manifest
+
+1. Open `./deploy/vars/common.yml`.
+
+    You'll see entries for both `task_1` and `file_io`. E.g.:
+
+    ```python
+    # This task sends status back to CloudReactor as it is running
+    task_1:
+        <<: *default_task_config
+        description: "This description shows up in CloudReactor dashboard"
+        command: "python src/task_1.py"
+        schedule: cron(9 15 * * ? *)
+        wrapper:
+            <<: *default_task_wrapper
+            enable_status_updates: true
+    ```
+
+    You can think of `common.yml` as a manifest of tasks. Running `./docker_deploy.sh` will push the files defined here to ECS, and register them with CloudReactor.
+
+2. Add a configuration block for your new task, below `task_name_to_config:`
+
+    The minimum required block is:
+
+    ```python
+    new_task:
+        <<: *default_task_config
+        command: "python src/new_task.py"
+    ```
+
+    - `new_task`: a name for the configuration block
+    - `<<: *default_task_config` allows new_task to inherit properties from the default task configuration
+    - `command: "python src/new_task.py"` contains the command to run (in this case, to execute `new_task` via python)
     
-    To troubleshoot deployment issues:
-    - In a bash shell, run:
-    ```
-    ./docker_deploy_shell.sh <environment>
-    ```
-    - In a Windows command prompt, run:   
-    ```
-    docker_deploy_shell.bat <environment>
-    ```
-    These commands will take you to a bash shell inside the deployer Docker container where you can re-run the deployment script with `./deploy.sh` and inspect the files it produces in the `build/` directory.
+    Additional parameters include the run schedule (cron expression), retry parameters, and environment variables. See [additional configuration](/configuration.md) for more options.
 
----
-
-## The example tasks
-
-Successfully deploying this example project will push two ECS tasks to AWS. You can log into [CloudReactor](https://dash.cloudreactor.io) to see these tasks.
-
-The code for each tasks is in the `./src` folder, i.e. `./src/task_1.py` and `./src/file_io.py`. Feel free to take a look.
-
-Next, open `./deploy/vars/common.yml` -- you'll see entries for both `task_1` and `file_io`. You can think of this as a manifest of tasks to push to ECS; the CloudReactor deployment script you just ran will look for the files defined here, push them to ECS, and register them with CloudReactor.
-
-These tasks have the following behavior:
-* *task_1* prints 30 numbers and exits successfully. While it does so, it updates the "successful" count and the "last status message" that is shown in CloudReactor, using the CloudReactor status updater library. It is configured to run daily via `deploy/vars/common.yml`
-* *file_io* uses [non-persistent file storage](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-task-storage.html) to write and read numbers
-* *web_server* uses a python library dependency (Flask) to implement a web server and shows how to link an AWS Application Load Balancer (ALB) to a service. It requires that an ALB and target group be setup already, so it is not enabled by default (i.e. is commented out in the `./deploy/vars/common.yml` file).
-
----
-
-## Development workflow
-
-### Running the tasks locally
-
-The tasks are setup to be run with Docker Compose in `docker-compose.yml`. For example, you can build the Docker image that runs the tasks by typing:
-
-    docker-compose build
-
-(You only need to run this again when you change the dependencies required by the project.)
-
-Then to run, say `task_1`, type:
-
-    docker-compose run --rm task_1
-
-Docker Compose is setup so that changes in the environment file `deploy/files/.env.dev`
-and the files in `src` will be available without rebuilding the image.
+### Deploy tasks
 
 When ready to deploy, as before:
 
@@ -170,66 +214,61 @@ When ready to deploy, as before:
 
 - In a Windows command prompt, run:
     ```
-    docker_deploy <environment>  [task_names]
+    docker_deploy <environment> [task_names]
     ```
 
-`task_names` is optional; if omitted, all tasks defined in `./deploy/vars/common.yml` will be pushed.
-
----
+`task_names` is optional. If omitted, all tasks defined in `./deploy/vars/common.yml` will be pushed.
 
 
 ### More development options
 
-See the [development guide](docs/development.md) for instructions on how to debug, 
-add dependencies, and run tests and checks.
+See the [development guide](/development.md) for instructions on how to debug, add dependencies, and run tests and checks.
 
 ---
 
+## Removing tasks
+Delete tasks within the [CloudReactor dashboard](https://dash.cloudreactor.io){:target="_blank"}. This will remove the task from AWS also.
 
-## Deploying your own tasks
+You should also remove the reference to the tasks in `./deploy/vars/common.yml`.
+- If you don't, if you run `./docker_deploy.sh [environment]` (without task names), this will (re-)push all tasks -- which might include tasks you had intended to remove.
 
-### Adding new tasks
-Now that you have deployed the example tasks, you can move your existing code to this project. To add your own task:
-1. Place task code itself in a new file in `./src`, e.g. `new_task.py`
-2. Add a configuration block for the task in `deploy/vars/common.yml`, below `task_name_to_config:` A minimal configuration block is:
-    
-```python
-new_task:
+You may also want to remove the task code itself from `/src/`
+
+For example, if you want to delete the `task_1` task:
+1. In [dash.cloudreactor.io](https://www.cloudreactor.io){:target="_blank"}, hit the delete icon next to `task_1` and hit "confirm".
+2. Open `./deploy/vars/common.yml` and delete the entire `task_1:` code block i.e.:
+
+    ```python
+    task_1:
     <<: *default_task_config
-    command: "python src/new_task.py"
-```
-
-    - `<<: *default_task_config` allows new_task to inherit properties from the default task configuration
-    - `command: "python src/new_task.py"` contains the command to run (in this case, to execute new_task via python)
-    - Additional parameters include the run schedule (cron expression), retry parameters, and environment variables. See [additional configuration](docs/configuration.md).
-
-### Removing tasks
-Delete tasks within the [CloudReactor dashboard](https://dash.cloudreactor.io). This will remove the task from AWS also.
-
-You should also remove the reference to the tasks (and maybe the task code itself if you want) in `./deploy/vars/common.yml`. If you don't, if you run `./docker_deploy.sh [environment]` (without task names), this will (re-)push all tasks -- which might include tasks you had intended to remove.
-
-For example, if you want to delete the `task_1` task, open `./deploy/vars/common.yml` and delete the entire `task_1:` code block i.e.:
-
-```python
-task_1:
-<<: *default_task_config
-description: "This description shows up in CloudReactor dashboard"
-command: "python src/task_1.py"
-schedule: cron(9 15 * * ? *)
-wrapper:
-    <<: *default_task_wrapper
-    enable_status_updates: true
-```
+    description: "This description shows up in CloudReactor dashboard"
+    command: "python src/task_1.py"
+    schedule: cron(9 15 * * ? *)
+    wrapper:
+        <<: *default_task_wrapper
+        enable_status_updates: true
+    ```
+3. Optionally, delete `/src/task_1.py`.
 
 ---
 
-## Next steps
+## The example tasks
 
-* [Additional configuration](docs/configuration.md) options can be set or overridden
-* If you want to be alerted when task executions fail, setup an [Alert Method](docs/alerts.md)
-* To avoid leaking secrets (passwords, API keys, etc.), see the guide on [secret management](docs/secret_management.md)
-* For more secure [networking](docs/networking.md), run your tasks on private subnets and/or tighten your security groups.
-* If you're having problems, see the [troubleshooting guide](docs/troubleshooting.md)
+The example tasks show a few helpful features of CloudReactor that can be used in your own code.
+
+- *task_1* prints 30 numbers and exits successfully. While it does so, it uses the CloudReactor status updater library to update the "successful" count and the "last status message" that is shown in the CloudReactor dashboard. These can be used to help track "# of rows processed successfully" or progress through the code. Note that task_1 is configured to run daily via `deploy/vars/common.yml`: `schedule: cron(9 15 * * ? *)`.
+- *file_io* uses [non-persistent file storage](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-task-storage.html){:target="_blank"} to write and read numbers
+- *web_server* uses a python library dependency (Flask) to implement a web server and shows how to link an AWS Application Load Balancer (ALB) to a service. It requires that an ALB and target group be setup already, so it is not enabled by default (i.e. is commented out in the `./deploy/vars/common.yml` file).
+
+---
+
+## More information
+
+* [Additional configuration](/configuration.md) options can be set or overridden
+* If you want to be alerted when task executions fail, setup an [Alert Method](/alerts.md)
+* To avoid leaking secrets (passwords, API keys, etc.), see the guide on [secret management](/secret_management.md)
+* For more secure [networking](/networking.md), run your tasks on private subnets and/or tighten your security groups.
+* If you're having problems, see the [troubleshooting guide](/troubleshooting.md)
 
 
 ---
