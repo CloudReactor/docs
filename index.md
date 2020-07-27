@@ -154,17 +154,19 @@ If this is the first time running the task locally, run:
 docker-compose run --rm pip-compile
 docker-compose build
 ```
-- **docker-compose run --rm pip-compile**: this generates a new `requirements.txt` (used by Docker Compose) from `/requirements.in`
-- **docker-compose build**: this builds the container
+- *docker-compose run --rm pip-compile*: this generates a new `requirements.txt` (used by Docker Compose) from `/requirements.in`
+- *docker-compose build*: this builds the container
 
 Then to run e.g. `new_task`, type:
 ```
 docker-compose run --rm new_task
 ```
 
-**You do not need to run `docker-compose build` each time you make changes to `new_task`.** Changes in the environment file `deploy/files/.env.dev` and any files in `/src` will be updated automatically.
+Changes to files in `/src` and in the environment file `deploy/files/.env.dev` will be updated automatically. Therefore, if you only make changes to e.g. `/src/new_task`, you can just run `docker-compose run --rm new_task` to execute that task. 
 
-You only need to run `docker-compose run --rm pip-compile` and `docker-compose build` if you need to update dependencies due to requirements.in being changed.
+**You do not need to run `docker-compose build` each time you make changes to `new_task`.** There won't be any adverse consequences from doing so; this step just adds time.
+
+You only need to run `docker-compose run --rm pip-compile` and `docker-compose build` if `requirements.in` has changed.
 
 ### Add task to manifest
 
