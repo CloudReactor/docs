@@ -83,7 +83,7 @@ git clone [https://github.com/link_to_your_forked_repo]
     - You may also populate this file with a script you write yourself, for example with something that uses the AWS CLI to assume a role and gets temporary credentials.
     - If you are running this on an EC2 instance with an instance profile that has deployment permissions, you can leave this file blank.
 
-3. Copy `deploy/vars/example.yml` to `deploy/vars/<environment>.yml`, where `<environment>` is the name of the Run Environment created in CloudReactor [earlier](#set-up-aws-infrastructure-link-to-cloudreactor) (e.g. `staging`, `production`)
+3. Copy `deploy/vars/example.yml` to `deploy/vars/<environment>.yml`, where `<environment>` is the name of the Run Environment created during the Wizard [earlier](#set-up-aws-infrastructure-link-to-cloudreactor) (e.g. `staging`, `production`)
     - Open the .yml file you just created, and enter your **CloudReactor API key** next to `api_key`
     - If you're not using CloudReactor (i.e. you just want to use our tools to deploy to AWS, but don't want to manage tasks with CloudReactor): set `enabled: false` instead
 
