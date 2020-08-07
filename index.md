@@ -145,30 +145,7 @@ Add any dependencies to `/requirements.in`. For example:
 ```
 psycopg2==2.8.5
 ```
-
-### Run & test tasks locally
-
-If this is the first time running the task locally, run:
-
-```
-docker-compose run --rm pip-compile
-docker-compose build
-```
-- *docker-compose run --rm pip-compile*: this generates a new `requirements.txt` (used by Docker Compose) from `/requirements.in`
-- *docker-compose build*: this builds the container
-
-Then to run e.g. `new_task`, type:
-```
-docker-compose run --rm new_task
-```
-
-Changes to files in `/src` and in the environment file `deploy/files/.env.dev` will be updated automatically. Therefore, if you only make changes to e.g. `/src/new_task`, you can just run `docker-compose run --rm new_task` to execute that task. 
-
-**You do not need to run `docker-compose build` each time you make changes to `new_task`.** There won't be any adverse consequences from doing so; this step just adds time.
-
-You only need to run `docker-compose run --rm pip-compile` and `docker-compose build` if `requirements.in` has changed.
-
-### Add task to manifest
+### Add task to manifest and docker-file
 
 1. Open `./deploy/vars/common.yml`.
 
@@ -203,6 +180,37 @@ You only need to run `docker-compose run --rm pip-compile` and `docker-compose b
     - `command: "python src/new_task.py"` contains the command to run (in this case, to execute `new_task` via python)
     
     Additional parameters include the run schedule (cron expression), retry parameters, and environment variables. See [additional configuration](/configuration.md) for more options.
+
+3. Open `/docker-compose.yml` (in the root folder). Under the section `services` add a reference to your task:
+
+    ```
+    new_task:
+        <<: *service-base
+        command: python src/task_1.py
+    ```
+
+### Run & test tasks locally
+
+If this is the first time running the task locally, run:
+
+```
+docker-compose run --rm pip-compile
+docker-compose build
+```
+- *docker-compose run --rm pip-compile*: this generates a new `requirements.txt` (used by Docker Compose) from `/requirements.in`
+- *docker-compose build*: this builds the container
+
+Then to run e.g. `new_task`, type:
+```
+docker-compose run --rm new_task
+```
+
+Changes to files in `/src` and in the environment file `deploy/files/.env.dev` will be updated automatically. Therefore, if you only make changes to e.g. `/src/new_task`, you can just run `docker-compose run --rm new_task` to execute that task. 
+
+**You do not need to run `docker-compose build` each time you make changes to `new_task`.** There won't be any adverse consequences from doing so; this step just adds time.
+
+You only need to run `docker-compose run --rm pip-compile` and `docker-compose build` if `requirements.in` has changed.
+
 
 ### Deploy tasks
 
