@@ -13,21 +13,20 @@ CloudReactor provides a simple way to deploy, monitor, manage and orchestrate ta
 
 ## How is CloudReactor different from other schedulers?
 
-We try to make the developer experience end-to-end as painless as possible. Here are some of the key stages that we simplify:
-- Writing and testing a task locally: our Quickstart repo comes with a Docker python container. You can add libraries and requirements to this as required.
-- Deploying to AWS ECS: our Quickstart repo comes with a Docker container that handles deployment to AWS with just a single command
-- Running tasks on ECS Fargate: ECS Fargate is serverless, which has many benefits ([see below](#why-should-i-use-ecs?))
+We aim to make the end-to-end developer experience as painless as possible. For example, we simplify:
+- Minimize developer headaches: our Quickstart repo comes with a Docker python container. Containerisation ensures that all engineers on your team can develop in an identical environment -- and that the production instance will also be the same.
+- Deploying to AWS ECS: deploy to AWS with just a single command.
+- Running tasks on ECS Fargate: ECS Fargate is serverless, which eliminates server maintenance and reduces cost ([see below for more](#why-should-i-use-ecs))
 - Monitoring and managing tasks: the CloudReactor SaaS dashboard allows you to view historical executions, change run schedules and stop / start tasks with just a few clicks. Once CloudReactor has been integrated with a PagerDuty account, alert methods can be set up for any task or workflow with just a click
 - Orchestrating tasks: Our drag & drop workflow composer allows you to create a workflow **in seconds**
-
-Furthermore, CloudReactor is a hosted solution, meaning you don't need to set up or monitor any additional servers, databases, message queues, etc. This also simplifies upgrading.
+- System maintenance: CloudReactor is hosted, meaning you don't need to set up or maintain any additional servers, databases, message queues, etc.
 
 ## Why should I use ECS?
 
 Using AWS ECS with the Fargate execution method to run tasks has several benefits:
 
 1. Near infinite scalability -- run as many task instances as you want at any time
-2. No need to manage EC2 instances -- security patches, library upgrades, library compatibility issues, downtime. This leads to increased reliability and more time for developers
+2. No need to manage EC2 instances or other server hardware -- security patches, library upgrades, library compatibility issues, downtime. This leads to increased reliability and more time for developers
 3. Running Docker images leads to more predictable, isolated execution. Here's [a good summary of the advantages of Docker](https://www.linode.com/docs/applications/containers/when-and-why-to-use-docker/).
-4. Only pay for the CPU/memory you reserve while your tasks are running
+4. Reduce costs: only pay for the CPU/memory you reserve while your tasks are running
 5. Reliable scheduling by AWS without a separate scheduling server (e.g. no risk of scheduling server hanging)
