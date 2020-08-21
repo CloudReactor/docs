@@ -3,11 +3,13 @@ layout: default
 title: Home
 nav_order: 1
 ---
-# Easy serverless workflow automation
+# Easy workflow automation & monitoring
 {: .no_toc }
 {: .fs-10 }
 
 Deploy tasks with a single command to AWS ECS. Monitor, manage and orchestrate tasks with CloudReactor's easy-to-use dashboard.
+
+Use this one-page guide to learn everything you need to get up and running with key CloudReactor features. See additional pages in left nav bar for advanced topics.
 {: .fs-4 .fw-300 }
 
 [Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [Learn more about CloudReactor](/cloudreactor.html){:target="_blank"}{: .btn .fs-5 .mb-4 .mb-md-0 }
@@ -237,6 +239,53 @@ When ready to deploy your tasks to AWS, as before:
 ### More development options
 
 See the [development guide](/development.md) for instructions on how to debug, add dependencies, and run tests and checks.
+
+---
+
+## Tracking rows processed, custom status messages
+
+Two frequent needs when it comes to monitoring tasks is understanding how many rows have been processed, and what a given task is doing.
+
+The CloudReactor dashboard provides pre-defined fields where this information can be viewed. **You just need to instrument your task to send this data to CloudReactor.**
+
+To see a working example of how to do this, see `/src/task_1.py` in the quickstart repo. Further instructions below!
+
+### Check that status updates are enabled
+
+In `/deploy/vars/common.yml`, look for the block starting with `wrapper: &default_task_wrapper`.
+
+Add the line `enable_status_updates: True` inside this block if it's not there already. It should look like this:
+
+    wrapper: &default_task_wrapper
+        enable_status_updates: True
+
+### Call send_update in your task
+
+1. In your .py file in `/src/`, import the status_updater library:
+    ```
+    from status_updater import StatusUpdater
+    ```
+
+2. Create a new instance of StatusUpdater e.g.
+
+    ```
+    updater = StatusUpdater()
+    ```
+
+3. To send number of rows:
+    ```
+    updater.send_update(success_count=success_num_rows)
+
+    ```
+    
+    where `success_num_rows` is a variable containing the number of rows of "successful" records processed.
+
+    This number will then show up as the "processed" column in the CloudReactor dashboard.
+
+    You need to write the logic that tracks this number as part of your code (e.g. as rows are processed, increment the variable).
+
+4. 
+
 
 ---
 
