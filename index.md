@@ -141,10 +141,11 @@ git clone [https://github.com/link_to_your_forked_repo]
 
 1. Place task code itself in a new file in `./src`, e.g. `new_task.py`
 
-Add any dependencies to `/requirements.in`. For example:
-```
-psycopg2==2.8.5
-```
+    Add any dependencies to `/requirements.in`. For example:
+    ```
+    psycopg2==2.8.5
+    ```
+
 ### Add task to manifest and docker-file
 
 1. Open `./deploy/vars/common.yml`.
@@ -186,35 +187,38 @@ psycopg2==2.8.5
     ```
     new_task:
         <<: *service-base
-        command: python src/task_1.py
+        command: python src/new_task.py
     ```
 
 ### Run & test tasks locally
 
-If this is the first time running the task locally, run:
+1. If this is the first time running the task locally, run:
 
-```
-docker-compose run --rm pip-compile
-docker-compose build
-```
-- *docker-compose run --rm pip-compile*: this generates a new `requirements.txt` (used by Docker Compose) from `/requirements.in`
-- *docker-compose build*: this builds the container
+    ```
+    docker-compose run --rm pip-compile
+    docker-compose build
+    ```
+    - *docker-compose run --rm pip-compile*: this generates a new `requirements.txt` (used by Docker Compose) from `/requirements.in`
+    - *docker-compose build*: this builds the container
 
-Then to run e.g. `new_task`, type:
-```
-docker-compose run --rm new_task
-```
+2. Then to run e.g. `new_task` locally:
 
-Changes to files in `/src` and in the environment file `deploy/files/.env.dev` will be updated automatically. Therefore, if you only make changes to e.g. `/src/new_task`, you can just run `docker-compose run --rm new_task` to execute that task. 
+    ```
+    docker-compose run --rm new_task
+    ```
 
-**You do not need to run `docker-compose build` each time you make changes to `new_task`.** There won't be any adverse consequences from doing so; this step just adds time.
+3. As you continue to make changes to `new_task.py`, just re-run `docker-compose run --rm new_task` to execute that task locally.
 
-You only need to run `docker-compose run --rm pip-compile` and `docker-compose build` if `requirements.in` has changed.
+    **You do not need to run `docker-compose build` each time you make changes to `new_task`.** There won't be any adverse consequences from doing so; this step just adds time.
+
+    Under the hood, changes to files in `/src` and in the environment file `deploy/files/.env.dev` will be copied into the docker container automatically. This is why you don't need to run `docker-compose build` to rebuild the container.
+
+4. Run `docker-compose run --rm pip-compile` and `docker-compose build` if `requirements.in` has changed.
 
 
 ### Deploy tasks
 
-When ready to deploy, as before:
+When ready to deploy your tasks to AWS, as before:
 
 - In a bash shell, run:
 
