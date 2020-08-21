@@ -246,7 +246,7 @@ See the [development guide](/development.md) for instructions on how to debug, a
 
 Two frequent needs when it comes to monitoring tasks is understanding how many rows have been processed, and what a given task is doing.
 
-The CloudReactor dashboard provides pre-defined fields where this information can be viewed. **You just need to instrument your task to send this data to CloudReactor.**
+The CloudReactor dashboard provides pre-defined fields where this information can be viewed. **If you want to see data in these fields (as opposed to blanks), you must instrument your task to send this data to CloudReactor.**
 
 To see a working example of how to do this, see `/src/task_1.py` in the quickstart repo. Further instructions below!
 
@@ -259,7 +259,7 @@ Add the line `enable_status_updates: True` inside this block if it's not there a
     wrapper: &default_task_wrapper
         enable_status_updates: True
 
-### Call send_update in your task
+### Call `send_update` in your task
 
 1. In your .py file in `/src/`, import the status_updater library:
     ```
@@ -275,16 +275,35 @@ Add the line `enable_status_updates: True` inside this block if it's not there a
 3. To send number of rows:
     ```
     updater.send_update(success_count=success_num_rows)
-
     ```
     
-    where `success_num_rows` is a variable containing the number of rows of "successful" records processed.
-
-    This number will then show up as the "processed" column in the CloudReactor dashboard.
+    where `success_num_rows` is the number of rows of "successful" records processed. This number will show up as the "processed" column in the CloudReactor dashboard.
 
     You need to write the logic that tracks this number as part of your code (e.g. as rows are processed, increment the variable).
 
-4. 
+    Other "counts" that can be sent are below. These will show up in the relevant columns in CloudReactor.
+    - `error_count`
+    - `skipped_count`
+    - `expected_count`
+
+
+4. The CloudReactor dashboard also shows "last status message" for each task. This allows you to report custom messages during your task execution, improving visibility into what stage each task is at.
+
+    For example a given task might report status messages such as "getting auth token", "fetching data", "saving data" etc. 
+
+    Send a custom “status message” via StatusUpdater() like this:
+    ```
+    updater.send_update(last_status_message="started data ingestion")
+    ```
+5. Bundle multiple row counts and status message into a single call like this:
+    ```
+    updater.send_update(success_count=success_num_rows, error_count=error_num_rows, last_status_message="finished data ingestion")
+    ```
+6. Call `updater.shutdown()` to close this socket when your task completes.
+
+    StatusUpdater uses a UDP socket to send data. Shutdown() ensures that socket is closed.
+
+    Although it's good practice to clean up in this way, it's not strictly necessary since when the task finishes, all processes will end anyway.
 
 
 ---
