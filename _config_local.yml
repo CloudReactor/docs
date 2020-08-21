@@ -1,0 +1,10 @@
+title: CloudReactor.io Documentation
+description: CloudReactor.io documentation and reference
+url: "https://docs.cloudreactor.io"
+theme: "just-the-docs"
+ga_tracking: UA-165860121-1
+
+# Aux links for the upper right navigation
+aux_links:
+  "CloudReactor.io":
+    - "https://www.cloudreactor.io"
