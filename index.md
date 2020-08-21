@@ -3,11 +3,13 @@ layout: default
 title: Home
 nav_order: 1
 ---
-# Easy serverless workflow automation
+# Easy workflow automation & monitoring
 {: .no_toc }
 {: .fs-10 }
 
 Deploy tasks with a single command to AWS ECS. Monitor, manage and orchestrate tasks with CloudReactor's easy-to-use dashboard.
+
+Use this one-page guide to learn everything you need to get up and running with key CloudReactor features. See additional pages in left nav bar for advanced topics.
 {: .fs-4 .fw-300 }
 
 [Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [Learn more about CloudReactor](/cloudreactor.html){:target="_blank"}{: .btn .fs-5 .mb-4 .mb-md-0 }
@@ -141,10 +143,11 @@ git clone [https://github.com/link_to_your_forked_repo]
 
 1. Place task code itself in a new file in `./src`, e.g. `new_task.py`
 
-Add any dependencies to `/requirements.in`. For example:
-```
-psycopg2==2.8.5
-```
+    Add any dependencies to `/requirements.in`. For example:
+    ```
+    psycopg2==2.8.5
+    ```
+
 ### Add task to manifest and docker-file
 
 1. Open `./deploy/vars/common.yml`.
@@ -186,35 +189,38 @@ psycopg2==2.8.5
     ```
     new_task:
         <<: *service-base
-        command: python src/task_1.py
+        command: python src/new_task.py
     ```
 
 ### Run & test tasks locally
 
-If this is the first time running the task locally, run:
+1. If this is the first time running the task locally, run:
 
-```
-docker-compose run --rm pip-compile
-docker-compose build
-```
-- *docker-compose run --rm pip-compile*: this generates a new `requirements.txt` (used by Docker Compose) from `/requirements.in`
-- *docker-compose build*: this builds the container
+    ```
+    docker-compose run --rm pip-compile
+    docker-compose build
+    ```
+    - *docker-compose run --rm pip-compile*: this generates a new `requirements.txt` (used by Docker Compose) from `/requirements.in`
+    - *docker-compose build*: this builds the container
 
-Then to run e.g. `new_task`, type:
-```
-docker-compose run --rm new_task
-```
+2. Then to run e.g. `new_task` locally:
 
-Changes to files in `/src` and in the environment file `deploy/files/.env.dev` will be updated automatically. Therefore, if you only make changes to e.g. `/src/new_task`, you can just run `docker-compose run --rm new_task` to execute that task. 
+    ```
+    docker-compose run --rm new_task
+    ```
 
-**You do not need to run `docker-compose build` each time you make changes to `new_task`.** There won't be any adverse consequences from doing so; this step just adds time.
+3. As you continue to make changes to `new_task.py`, just re-run `docker-compose run --rm new_task` to execute that task locally.
 
-You only need to run `docker-compose run --rm pip-compile` and `docker-compose build` if `requirements.in` has changed.
+    **You do not need to run `docker-compose build` each time you make changes to `new_task`.** There won't be any adverse consequences from doing so; this step just adds time.
+
+    Under the hood, changes to files in `/src` and in the environment file `deploy/files/.env.dev` will be copied into the docker container automatically. This is why you don't need to run `docker-compose build` to rebuild the container.
+
+4. Run `docker-compose run --rm pip-compile` and `docker-compose build` if `requirements.in` has changed.
 
 
 ### Deploy tasks
 
-When ready to deploy, as before:
+When ready to deploy your tasks to AWS, as before:
 
 - In a bash shell, run:
 
@@ -233,6 +239,72 @@ When ready to deploy, as before:
 ### More development options
 
 See the [development guide](/development.md) for instructions on how to debug, add dependencies, and run tests and checks.
+
+---
+
+## Tracking rows processed, custom status messages
+
+Two frequent needs when it comes to monitoring tasks is understanding how many rows have been processed, and what a given task is doing.
+
+The CloudReactor dashboard provides pre-defined fields where this information can be viewed. **If you want to see data in these fields (as opposed to blanks), you must instrument your task to send this data to CloudReactor.**
+
+To see a working example of how to do this, see `/src/task_1.py` in the quickstart repo. Further instructions below!
+
+### Check that status updates are enabled
+
+In `/deploy/vars/common.yml`, look for the block starting with `wrapper: &default_task_wrapper`.
+
+Add the line `enable_status_updates: True` inside this block if it's not there already. It should look like this:
+
+    wrapper: &default_task_wrapper
+        enable_status_updates: True
+
+### Call `send_update` in your task
+
+1. In your .py file in `/src/`, import the status_updater library:
+    ```
+    from status_updater import StatusUpdater
+    ```
+
+2. Create a new instance of StatusUpdater e.g.
+
+    ```
+    updater = StatusUpdater()
+    ```
+
+3. To send number of rows:
+    ```
+    updater.send_update(success_count=success_num_rows)
+    ```
+    
+    where `success_num_rows` is the number of rows of "successful" records processed. This number will show up as the "processed" column in the CloudReactor dashboard.
+
+    You need to write the logic that tracks this number as part of your code (e.g. as rows are processed, increment the variable).
+
+    Other "counts" that can be sent are below. These will show up in the relevant columns in CloudReactor.
+    - `error_count`
+    - `skipped_count`
+    - `expected_count`
+
+
+4. The CloudReactor dashboard also shows "last status message" for each task. This allows you to report custom messages during your task execution, improving visibility into what stage each task is at.
+
+    For example a given task might report status messages such as "getting auth token", "fetching data", "saving data" etc. 
+
+    Send a custom “status message” via StatusUpdater() like this:
+    ```
+    updater.send_update(last_status_message="started data ingestion")
+    ```
+5. Bundle multiple row counts and status message into a single call like this:
+    ```
+    updater.send_update(success_count=success_num_rows, error_count=error_num_rows, last_status_message="finished data ingestion")
+    ```
+6. Call `updater.shutdown()` to close this socket when your task completes.
+
+    StatusUpdater uses a UDP socket to send data. Shutdown() ensures that socket is closed.
+
+    Although it's good practice to clean up in this way, it's not strictly necessary since when the task finishes, all processes will end anyway.
+
 
 ---
 
