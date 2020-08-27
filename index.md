@@ -74,13 +74,13 @@ With the underlying infrastructure set-up, we can now go ahead and deploy tasks 
 
 We do this by providing a "quickstart" repo. The repo contains the command-line tools that enable easy deployment to AWS, and simple toy tasks that illustrate features of CloudReactor.
 
-1. Fork [the quickstart repo](https://github.com/CloudReactor/cloudreactor-ecs-quickstart.git){:target="_blank"}. Then, once forked, clone it locally. (if you don't use GitHub, feel free to just clone; you just may want to check in every now and then see if there is an updated repo available):
+1. Fork or clone [the quickstart repo](https://github.com/CloudReactor/cloudreactor-ecs-quickstart.git){:target="_blank"}. Then, once forked, clone it locally. (if you don't use GitHub, feel free to just clone; you just may want to check in every now and then see if there is an updated repo available):
 ```
 git clone [https://github.com/link_to_your_forked_repo]
 ```
 
 2. In your favorite code editor, copy `deploy/docker_deploy.env.example` to `deploy/docker_deploy.env`. Open this file and fill in your `AWS access key`, `access key secret`, and `default region`.
-    - **The AWS keys used here must be for a user with privileges to deploy tasks to AWS ECS.** As mentioned [above](#note-setting-up-an-aws-user-with-deployment-permissions), you could use an Admin or power user, or create a new user specifically for deployment via CloudReactor.
+    - **The AWS keys used here must be for a user with privileges to deploy tasks to AWS ECS.** As mentioned [above](#optional-setting-up-a-new-aws-user-with-deployment-permissions), you could use an Admin or power user, or create a new user specifically for deployment via CloudReactor.
     - You may also populate this file with a script you write yourself, for example with something that uses the AWS CLI to assume a role and gets temporary credentials.
     - If you are running this on an EC2 instance with an instance profile that has deployment permissions, you can leave this file blank.
 
