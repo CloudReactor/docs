@@ -28,7 +28,7 @@ connect to your PagerDuty account.
 
 1. If you haven't already, create an account with PagerDuty
 2. Login to your PagerDuty account
-3. Choose the menu option `Configuration ... Services`. On that page 
+3. Choose the menu option `Configuration ... Service Directory`. On that page 
 select the `+ New Service` button to add a new Service.
 4. Name your Service anything you desire. Under Integration Settings ... Integration Type, select "Use our API directly" and ensure that 
 `Events API v2` is selected. If desired, adjust the Incident Settings.
