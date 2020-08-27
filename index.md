@@ -42,14 +42,10 @@ cd cloudreactor-aws-setup-wizard
 ./wizard.sh (or .\wizard.bat if using Windows)
 ```
 
-4. Go through the wizard.
-    - "Which AWS region will you run ECS tasks in?" -- you should choose a region where other resources that you wish your tasks to access are located. For example, if you have an RDS instance in `us-west-2` that you wish to access from your tasks, be sure to choose `us-west-2` here.
-    - The wizard will ask "What do you want to name your Run Environment?" -- this is a name used in CloudReactor to refer to the infrastructure you're setting up. If you're setting up a cluster to run production or staging tasks, you might call this "production" or "staging" respectively for example. **Remember this name for use later.**
-
-
-The AWS Setup Wizard will let you select a region, ECS cluster, VPC, subnet, etc. for CloudReactor to use. If any of those pieces don't exist, it can create them for you.
-
-Because the wizard automates the creation of resources in AWS, it will ask for your AWS user credentials. <strong>We strongly recommend providing it with an AWS Administrator user</strong>. The code behind the wizard is publicly viewable on GitHub: [https://github.com/CloudReactor/cloudreactor-aws-setup-wizard](https://github.com/CloudReactor/cloudreactor-aws-setup-wizard){:target="_blank"}.
+4. Go through the wizard. The wizard lets you select a region, ECS cluster, VPC, subnet, etc. for you to run tasks in (and which CloudReactor will manage). And if any of those pieces don't exist, it can create them for you.
+    - "Which AWS region will you run ECS tasks in?": you should choose a region where other resources that you wish your tasks to access are located. For example, if you have an RDS instance in `us-west-2` that you wish to access from your tasks, be sure to choose `us-west-2` here.
+    - "What is the AWS access key do you want to use for this wizard?": we strongly recommend providing AWS Administrator user credentials. This is because the wizard will be creating resources (ECS cluster, VPC, subnets, etc.). The code behind the wizard is publicly viewable on GitHub: [https://github.com/CloudReactor/cloudreactor-aws-setup-wizard](https://github.com/CloudReactor/cloudreactor-aws-setup-wizard){:target="_blank"}
+    - "What do you want to name your Run Environment?": this is a name used in CloudReactor to refer to the infrastructure you're setting up. If you're setting up a cluster to run production or staging tasks, you might call this "production" or "staging" respectively for example. **Remember this name for use later.**
 
 If you don't want to use the Setup Wizard for some reason, you can refer to the [manual setup instructions](/manual_setup.md){:target="_blank"} -- but note that setting up each piece of infrastructure manually will be time-consuming and error-prone.
 
