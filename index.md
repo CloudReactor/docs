@@ -42,7 +42,10 @@ cd cloudreactor-aws-setup-wizard
 ./wizard.sh (or .\wizard.bat if using Windows)
 ```
 
-4. Go through the wizard. The wizard will ask "What do you want to name your Run Environment?" -- this is a name used in CloudReactor to refer to the infrastructure you're setting up. If you're setting up a cluster to run production or staging tasks, you might call this "production" or "staging" respectively for example. **Remember this name for use later.**
+4. Go through the wizard.
+    - "Which AWS region will you run ECS tasks in?" -- you should choose a region where other resources that you wish your tasks to access are located. For example, if you have an RDS instance in `us-west-2` that you wish to access from your tasks, be sure to choose `us-west-2` here.
+    - The wizard will ask "What do you want to name your Run Environment?" -- this is a name used in CloudReactor to refer to the infrastructure you're setting up. If you're setting up a cluster to run production or staging tasks, you might call this "production" or "staging" respectively for example. **Remember this name for use later.**
+
 
 The AWS Setup Wizard will let you select a region, ECS cluster, VPC, subnet, etc. for CloudReactor to use. If any of those pieces don't exist, it can create them for you.
 
