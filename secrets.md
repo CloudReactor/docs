@@ -95,4 +95,4 @@ variables that the tasks can read during runtime. To do that, add a
                    -name: SOME_SECRET_NAME
                     valueFrom: "arn:aws:ssm:<region>:<aws_account_id>:parameter/parameter_name"
 
-See `deploy/common.yml` for an example on how to do that.
+See `deploy/vars/common.yml` for an example on how to do that.
