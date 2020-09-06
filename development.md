@@ -50,11 +50,16 @@ To adding a python library to your runtime dependencies, follow these steps:
 
 1. Add the library name to `requirements.in`
 2. Run:
-    `docker-compose run --rm pip-compile`
-This will update the file `requirements.txt`.
+    ```
+    docker-compose run --rm pip-compile
+    ```
+
+    This will update the file `requirements.txt`.
 3. Rebuild your task code:
 
+    ```
     docker-compose build task_1
+    ```
 
 Now you can start using the dependency in your code.
 
@@ -62,19 +67,24 @@ Now you can start using the dependency in your code.
 
 Development dependencies are libraries used during development and testing but not used when the tasks are deployed. For example, `pytest` is a development dependency because it is needed to run tests during development, but not needed to run the actual tasks.
 
-To adding a python library to your development dependencies, follow these steps:
+To add a python library to your development dependencies, follow these steps:
 
 1. Add the library name to `dev-requirements.in`
 2. Run:
 
+    ```
     docker-compose run --rm pip-compile-dev
+    ```
 
-This will update the file `dev-requirements.txt`.
+    This will update the file `dev-requirements.txt`.
+
 3. If necessary, add another service to `docker-compose.yml` that runs the development task. Also build your development task image:
 
+    ```
     docker-compose build <task name>
+    ```
 
-where `<task_name>` is the name of the service you added in step 3.
+    where `<task_name>` is the name of the service you added in step 3.
 
 Now you can start using the development dependency.
 
