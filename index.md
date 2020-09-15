@@ -347,7 +347,7 @@ The example tasks show a few helpful features of CloudReactor that can be used i
 
 * [Additional configuration](/configuration.md) options can be set or overridden
 * If you want to be alerted when task executions fail, setup an [Alert Method](/alerts.md)
-* To avoid leaking secrets (passwords, API keys, etc.), see the guide on [secret management](/secret_management.md)
+* To avoid leaking secrets (passwords, API keys, etc.), see the guide on [secret management](/secrets.md)
 * For more secure [networking](/networking.md), run your tasks on private subnets and/or tighten your security groups.
 * If you're having problems, see the [troubleshooting guide](/troubleshooting.md)
 
