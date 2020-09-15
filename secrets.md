@@ -47,7 +47,7 @@ those secrets to be available to tasks deployed to your "prod" ECS cluster /
 CloudReactor run environment.
 
     Then, in the `deploy/vars/prod.yml` file (if it doesn't exist, copy / rename
-    from `deploy/vars/common.yml`), add the following block.
+    from `deploy/vars/example.yml`), add the following block.
 
     Note that each entry in `secrets:` consists of a name and valueFrom, where
     the name is chosen by you, and valueFrom is the full ARN from AWS Secrets
