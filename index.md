@@ -86,20 +86,36 @@ git clone [https://github.com/link_to_your_forked_repo]
 
 3. Copy `deploy/vars/example.yml` to `deploy/vars/<environment>.yml`, where `<environment>` is the name of the Run Environment created during the Wizard [earlier](#set-up-aws-infrastructure-link-to-cloudreactor) (e.g. `staging`, `production`)
     - Open the .yml file you just created, and enter your **CloudReactor API key** next to `api_key`
+    - This allows the task to be registered with CloudReactor when you deploy the task from your local machine
     - If you're not using CloudReactor (i.e. you just want to use our tools to deploy to AWS, but don't want to manage tasks with CloudReactor): set `enabled: false` instead
 
-4. Adding the CloudReactor API key to the `<environment>.yml` file is necessary for deploying tasks from your local machine to ECS. However, after the task is deployed, when it actually runs, it also needs to know the CloudReactor API key in order to communicate with CloudReactor. For this purpose, we will add the CloudReactor API key to AWS Secrets Manager, and allow your task to read that secret.
+4. After the task is deployed, when it actually runs, it also needs to know the CloudReactor API key in order to communicate with CloudReactor (e.g. status updates, start/stop, etc.). As a security best practice, we will add the CloudReactor API key to AWS Secrets Manager, and allow your task to read that secret during runtime. Note that you can follow a similar process for adding your own runtime secrets (e.g. database credentials) to tasks.
     - In the AWS Console, go to Secrets Manager, and "Store a new secret". Select "other types of secrets (e.g. API key)". Select "plaintext", and paste in your CloudReactor API key as the entire field (i.e. no need for braces, quotes etc.). On the next page, for "secret name", type `CloudReactor/<cloudreactor_runenvironment_name>/common/cloudreactor_api_key`. **Replace `<cloudreactor_runenvironment_name>` with whatever your CloudReactor run environment (and .yml file above) is called**. You can also choose a different name to cloudreactor_api_key if you want to. Create the secret. Then, copy the full "secret ARN"; it'll look something like this:
     ```
     arn:aws:secretsmanager:<region>:<account_id>:secret:CloudReactor/prod/common/cloudreactor_api_key-xxx123
     ```
     - Note that by default, the CloudReactor AWS Setup Wizard that you probably ran earlier allows tasks that are deployed with CloudReactor to read secrets that are stored under `CloudReactor/<cloudreactor_runenvironment_name/common/`.
-    - In your code editor, open the .yml file from the previous step (e.g. `/deploy/vars/staging.yml`). You will find the following code block:
+    - In your code editor, open the .yml file from the previous step (e.g. `/deploy/vars/staging.yml`). You will find the following code block. **Replace valueFrom with your CloudReactor secret key ARN**:
+
     ```
-    secrets: &default_env_secrets
-    - name: PROC_WRAPPER_API_KEY
-      valueFrom: "arn:aws:secretsmanager:<region>:<account_id>:secret:CloudReactor/prod/common/cloudreactor_api_key-xxx123"
+        secrets: &default_env_secrets
+        - name: PROC_WRAPPER_API_KEY
+          valueFrom: "arn:aws:secretsmanager:<region>:<account_id>:secret:CloudReactor/prod/common/cloudreactor_api_key-xxx123"
     ```
+    - Finally, we need to ensure that your task inherits the ability to read this secret. In that same .yml file, scroll down to the section starting:
+    ```
+    task_name_to_env_config:
+          task_1:
+            <<: *default_env_task_config
+    ```
+    As written, this enables `task_1` to read the "secrets" block above (which includes e.g. `PROC_WRAPPER_API_KEY`). If you want to enable other tasks to read these secrets, you would simply add a new block for that task; for example:
+    ```
+    task_name_to_env_config:
+          # add the two lines below
+          new_task:
+            <<: *default_env_task_config
+    ```
+    - See the page on [secrets](/secrets.md) for further information on how to add your own runtime secrets.
 
 5. Ensure Docker is running (you should have installed it [above](#set-up-aws-infrastructure-link-to-cloudreactor)). Deployment with Docker is highly recommended because:
     - you don't need to have python installed directly on your machine
