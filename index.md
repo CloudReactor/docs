@@ -88,14 +88,27 @@ git clone [https://github.com/link_to_your_forked_repo]
     - Open the .yml file you just created, and enter your **CloudReactor API key** next to `api_key`
     - If you're not using CloudReactor (i.e. you just want to use our tools to deploy to AWS, but don't want to manage tasks with CloudReactor): set `enabled: false` instead
 
-4. Ensure Docker is running (you should have installed it [above](#set-up-aws-infrastructure-link-to-cloudreactor)). Deployment with Docker is highly recommended because:
+4. Adding the CloudReactor API key to the `<environment>.yml` file is necessary for deploying tasks from your local machine to ECS. However, after the task is deployed, when it actually runs, it also needs to know the CloudReactor API key in order to communicate with CloudReactor. For this purpose, we will add the CloudReactor API key to AWS Secrets Manager, and allow your task to read that secret.
+    - In the AWS Console, go to Secrets Manager, and "Store a new secret". Select "other types of secrets (e.g. API key)". Select "plaintext", and paste in your CloudReactor API key as the entire field (i.e. no need for braces, quotes etc.). On the next page, for "secret name", type `CloudReactor/<cloudreactor_runenvironment_name>/common/cloudreactor_api_key`. **Replace `<cloudreactor_runenvironment_name>` with whatever your CloudReactor run environment (and .yml file above) is called**. You can also choose a different name to cloudreactor_api_key if you want to. Create the secret. Then, copy the full "secret ARN"; it'll look something like this:
+    ```
+    arn:aws:secretsmanager:<region>:<account_id>:secret:CloudReactor/prod/common/cloudreactor_api_key-xxx123
+    ```
+    - Note that by default, the CloudReactor AWS Setup Wizard that you probably ran earlier allows tasks that are deployed with CloudReactor to read secrets that are stored under `CloudReactor/<cloudreactor_runenvironment_name/common/`.
+    - In your code editor, open the .yml file from the previous step (e.g. `/deploy/vars/staging.yml`). You will find the following code block:
+    ```
+    secrets: &default_env_secrets
+    - name: PROC_WRAPPER_API_KEY
+      valueFrom: "arn:aws:secretsmanager:<region>:<account_id>:secret:CloudReactor/prod/common/cloudreactor_api_key-xxx123"
+    ```
+
+5. Ensure Docker is running (you should have installed it [above](#set-up-aws-infrastructure-link-to-cloudreactor)). Deployment with Docker is highly recommended because:
     - you don't need to have python installed directly on your machine
     - you don't need to add another set of dependencies to your libraries
     - you can deploy irrespective of your OS (e.g. if you're running Windows).
     
     If you don't want to use Docker, you'll need to set up your local environment to deploy natively. This requires installing python and various dependencies. See [this section](#){:target="_blank"} for details, and skip steps 5 & 6 below.
 
-5. Build the Docker container that will deploy the project. This may take a few minutes to complete so be ready to make some tea / coffee while you wait.
+6. Build the Docker container that will deploy the project. This may take a few minutes to complete so be ready to make some tea / coffee while you wait.
 
     Replace `<environment>` below with the name of the Run Environment and .yml file created immediately above (e.g. "staging", "production").
 
@@ -111,7 +124,7 @@ git clone [https://github.com/link_to_your_forked_repo]
     
     Running `docker_build_deployer` is only necessary once, unless you add additional configuration to `deploy/Dockerfile`.
 
-6. Deploy the example tasks to AWS.
+7. Deploy the example tasks to AWS.
 
     This will push two toy tasks to AWS and register them with CloudReactor. Successfully pushing these tasks to AWS confirms that setup is complete. The tasks can be easily deleted later.
     
@@ -132,7 +145,7 @@ git clone [https://github.com/link_to_your_forked_repo]
 
     If you encounter issues, see the [troubleshooting guide](/troubleshooting.md){:target="_blank"}.
 
-7. Log into [dash.cloudreactor.io](https://dash.cloudreactor.io){:target="_blank"}. You should see the two example tasks listed there. You can manually start and stop these tasks, or schedule them to run. They'll run on the AWS ECS infrastructure we created earlier. You can confirm this by starting a task, then navigating to the ECS cluster in the AWS console (i.e. AWS console > ECS > select cluster). Under the "tasks" tab, you'll see a running task that corresponds to the task just started via CloudReactor.
+8. Log into [dash.cloudreactor.io](https://dash.cloudreactor.io){:target="_blank"}. You should see the two example tasks listed there. You can manually start and stop these tasks, or schedule them to run. They'll run on the AWS ECS infrastructure we created earlier. You can confirm this by starting a task, then navigating to the ECS cluster in the AWS console (i.e. AWS console > ECS > select cluster). Under the "tasks" tab, you'll see a running task that corresponds to the task just started via CloudReactor.
 
 ---
 
