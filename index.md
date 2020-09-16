@@ -132,7 +132,7 @@ git clone [https://github.com/link_to_your_forked_repo]
 
     If you encounter issues, see the [troubleshooting guide](/troubleshooting.md){:target="_blank"}.
 
-7. Log into [dash.cloudreactor.io](https://dash.cloudreactor.io){:target="_blank"}. You should see the two example tasks listed there. You can manually start and stop these tasks, or schedule them to run. They'll run on the AWS ECS infrastructure we created earlier.
+7. Log into [dash.cloudreactor.io](https://dash.cloudreactor.io){:target="_blank"}. You should see the two example tasks listed there. You can manually start and stop these tasks, or schedule them to run. They'll run on the AWS ECS infrastructure we created earlier. You can confirm this by starting a task, then navigating to the ECS cluster in the AWS console (i.e. AWS console > ECS > select cluster). Under the "tasks" tab, you'll see a running task that corresponds to the task just started via CloudReactor.
 
 ---
 
