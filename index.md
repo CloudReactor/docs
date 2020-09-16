@@ -43,6 +43,7 @@ cd cloudreactor-aws-setup-wizard
 ```
 
 4. Go through the wizard. The wizard lets you select a region, ECS cluster, VPC, subnet, etc. for you to run tasks in (and which CloudReactor will manage). And if any of those pieces don't exist, it can create them for you.
+    - Questions with square brackets at the end indicate a default value: simply hit enter to accept the default. For example, `What do you want to name the CloudFormation stack to create a VPC? [ECS-VPC]` -- here, the default value is `ECS-VPC`.
     - "Which AWS region will you run ECS tasks in?": you should choose a region where other resources that you wish your tasks to access are located. For example, if you have an RDS instance in `us-west-2` that you wish to access from your tasks, be sure to choose `us-west-2` here.
     - "What is the AWS access key do you want to use for this wizard?": we strongly recommend providing AWS Administrator user credentials. This is because the wizard will be creating resources (ECS cluster, VPC, subnets, etc.). The code behind the wizard is publicly viewable on GitHub: [https://github.com/CloudReactor/cloudreactor-aws-setup-wizard](https://github.com/CloudReactor/cloudreactor-aws-setup-wizard){:target="_blank"}
     - "What do you want to name your Run Environment?": this is a name used in CloudReactor to refer to the infrastructure you're setting up. If you're setting up a cluster to run production or staging tasks, you might call this "production" or "staging" respectively for example. **Remember this name for use later.**
