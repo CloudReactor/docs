@@ -11,8 +11,8 @@ Still want to go ahead with manual setup?
 
 Broadly speaking, we'll need to:
 - [Set up a cluster in AWS ECS](#set-up-a-cluster-in-aws-ecs) (this is where your tasks will be deployed to)
-- [(Optional) Set up AWS role permissions to allow CloudReactor to stop, start and schedule ECS tasks](#optional-set-aws-role-permissions-to-allow-cloudreactor-to-stop-start-and-schedule-ecs-tasks)
-- [(Optional) Configure CloudReactor with AWS ECS and AWS role settings](#optional-configure-cloudreactor-with-aws-ecs-and-aws-role-settings)
+- [Set up AWS role permissions to allow CloudReactor to stop, start and schedule ECS tasks](#set-aws-role-permissions-to-allow-cloudreactor-to-stop-start-and-schedule-ecs-tasks)
+- [Configure CloudReactor with AWS ECS and AWS role settings](#configure-cloudreactor-with-aws-ecs-and-aws-role-settings)
 
 Configuration will require some keys and other parameters to be entered. We'll note anything you need to record in  <span style="color: red">red</span> -- open up a text file to hold those variables as we go along.
 
@@ -51,7 +51,7 @@ You can see these in VPC .. Subnets. Note that if you used the wizard to create 
 
 ---
 
-### (Optional) Set AWS role permissions to allow CloudReactor to stop, start and schedule ECS tasks
+### Set AWS role permissions to allow CloudReactor to stop, start and schedule ECS tasks
 To have CloudReactor manage your tasks in your AWS environment, you'll need to give CloudReactor permissions in AWS to run tasks, schedule tasks, create services, and trigger Workflows by deploying the [CloudReactor AWS CloudFormation template](https://github.com/CloudReactor/aws-role-template), named `cloudreactor-aws-role-template.json`.
 
 Follow the instructions in the [README.md](https://github.com/CloudReactor/aws-role-template/blob/master/README.md#allowing-cloudreactor-to-manage-your-tasks), in the section "Allowing CloudReactor to manage your tasks".
@@ -65,10 +65,10 @@ Follow the instructions in the [README.md](https://github.com/CloudReactor/aws-r
 
 ---
 
-### (Optional) Configure CloudReactor with AWS ECS and AWS role settings
-Contact us at support@cloudreactor.io and we'll create an account for you and give you an API key.
+### Configure CloudReactor with AWS ECS and AWS role settings
+Sign up for a CloudReactor account at [https://dash.cloudreactor.io/signup](https://dash.cloudreactor.io/signup), and login.
 
-Then login to the [CloudReactor dashboard](https://dash.cloudreactor.io/). We'll create a Run Environment in CloudReactor; a Run Environment contains settings that tell CloudReactor how to run tasks in AWS.
+We'll create a Run Environment in CloudReactor. A Run Environment contains settings that tell CloudReactor how to run tasks in AWS.
 
 1. Click on "Run Environments", then "Add Environment"
 2. Name your environment (e.g. "staging", "production"). You may want to keep the name in all lowercase letters without spaces or symbols besides "-" and "_", so that filenames and command-lines you'll use later will be sane. <span style="color: red">Note the exact name of your Run Environment</span>, as you'll need this later.
