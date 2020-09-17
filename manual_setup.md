@@ -93,4 +93,4 @@ We'll create a Run Environment in CloudReactor. A Run Environment contains setti
 
 At this point, AWS has the required infrastructure to run tasks on ECS, and CloudReactor and AWS can talk to each other.
 
-Now, we can [deploy tasks and have them managed by CloudReactor](docs/index.md#).
+Now, we can [deploy tasks and have them managed by CloudReactor](/index.md).
