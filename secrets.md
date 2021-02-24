@@ -79,7 +79,7 @@ contains these secret files is compromised, those secrets can be exposed.
 If you are running your tasks in AWS, one option for runtime secrets
 is to store them in AWS Secrets Manager.
 
-1. Log into [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/) in
+Step 1: Log into [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/) in
 the AWS Console. Create a secrets object with key/value pairs for each resource
 you want to store secrets for.
 
@@ -95,9 +95,8 @@ After storing the secret, copy the ARN of the secret. It should look like:
 
     arn:aws:secretsmanager:us-west-2:012345678901:secret:myorg/myapp/production/db-BHyuR
 
-2. Next, create a IAM Role that is has permission to access your secret.
+Step 2: Next, create a IAM Role that is has permission to access your secret.
 It should have a policy that looks like this:
-
 
     {
       "Version": "2012-10-17",
@@ -146,7 +145,7 @@ Once you've created the role, record the ARN which should look like:
 
 which we will use in step 4.
 
-3. Now we can make those secrets available to your tasks. You can have your code fetch these
+Step 3: Now we can make those secrets available to your tasks. You can have your code fetch these
 secrets directly from AWS Secrets Manager, and parse them, or you can use the
 [proc_wrapper](https://github.com/CloudReactor/cloudreactor-procwrapper)
 module fetch, parse, and populate them into your environment before your program starts.
@@ -157,7 +156,7 @@ You can follow the instructions in the proc_wrapper
 your project yourself, or you can use the [example project](https://github.com/CloudReactor/cloudreactor-ecs-quickstart)
 which has deployment to ECS Fargate with CloudReactor management setup.
 
-Let's assume you are using the example project, and that you want to deploy a task that reads the
+Let's assume you are using an example project, and that you want to deploy a task that reads the
 database to the "production" CloudReactor Run Environment.
 
 Then, in the `deploy/vars/production.yml` file (if it doesn't exist, copy
@@ -177,9 +176,9 @@ will be populated at runtime.
 You can also remove the "-BHyuR" suffix from your secret ARNs if you want your task
 to fetch the latest value of your secret, instead of a fixed value.
 
-4. Finally, ensure that your program runs with the IAM role you set up in step 2.
+Step 4: Finally, ensure that your program runs with the IAM role you set up in step 2.
 If running in ECS, you'll want to use the role as the "Task Role". If you are starting from
-the example project, uncomment/edit the following lines in `deploy/vars/production.yml`:
+an example project, uncomment/edit the following lines in `deploy/vars/production.yml`:
 
     default_env_task_config:
       command: "python src/task_1.py"
@@ -188,10 +187,10 @@ the example project, uncomment/edit the following lines in `deploy/vars/producti
           role_arn: "arn:aws:iam::012345678901:role/myapp-task-role-production"
 
 If running in EC2, ensure the EC2 instances you run your program in have the instance role you created in step 2.
-See the official AWS documentation (IAM roles for Amazon EC2)[https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html]
+See the official AWS documentation [IAM roles for Amazon EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html)
 for details.
 
-5. Deploy your project and the proc_wrapper module should be able to fetch and parse your secrets,
+Step 5: Deploy your project and the proc_wrapper module should be able to fetch and parse your secrets,
 and inject them into your program's environment. It's up to your program to read the
 environment variables and configure things from there.
 
