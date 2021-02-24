@@ -12,8 +12,9 @@ If you forked or cloned an example CloudReactor quick start project, you most li
 However, for sharing with a team or to have the secrets in source control for backup/history reasons, it's better to check the secret files in, but encrypted. Alternatively, you can get secrets from AWS at runtime.
 
 Here, we'll cover the management of 2 types of secrets:
-* Deployment secrets: these are secrets needed to deploy your task, but are not required while the task is running. For example, to deploy tasks using CloudReactor, you add AWS keys to the file `/deploy/docker_deploy.env`, and your CloudReactor API key to the file `/deploy/vars/[production].yml` (where "production" is the name of a run environment in CloudReactor).
-* Runtime secrets: these are secrets that your task uses while it is running. Examples are database passwords and API keys for 3rd party services your task uses. In this example project, the file `deploy/files/.env.<environment>` contains runtime secrets. The python tasks read this file at runtime using the [python-dotenv](https://github.com/theskumar/python-dotenv) library.
+* Deployment secrets: these are secrets needed to deploy your task, but are not required while the task is running. For example, to deploy tasks using CloudReactor, you add AWS keys to the file `deploy/docker_deploy.env`, and your CloudReactor API key to the file `deploy/vars/<environment>.yml` (where "<environment>" is the name of a Run Environment in CloudReactor).
+* Runtime secrets: these are secrets that your task uses while it is running. Examples are database passwords and API keys for 3rd party services your task uses. In the example projects, the file `deploy/files/.env.<environment>` contains runtime secrets. In the python example project,
+python tasks read this file at runtime using the [python-dotenv](https://github.com/theskumar/python-dotenv) library.
 
 Three methods of managing secrets that we'll cover are:
 
@@ -26,11 +27,11 @@ Three methods of managing secrets that we'll cover are:
 
 One option for managing either deployment or runtime secrets is to use
 [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
-which is well integrated with ansible. Ansible is used to deploy this
-example project, and it will transparently decrypt files encrypted with
+which is well integrated with ansible. Ansible is used to deploy the
+example projects, and it will transparently decrypt files encrypted with
 ansible-vault when copying them.
 
-To use ansible-vault to encrypt your deployment secrets, change your directory to /deploy/vars and run:
+In the example projects, to use ansible-vault to encrypt your deployment secrets, change your directory to `/deploy/vars` and run:
 
     ansible-vault encrypt [environment].yml
 
@@ -46,21 +47,17 @@ external file tha contains the encryption password. See this
 details.
 
 You can also use Ansible Vault to encrypt runtime secrets, by following the
-steps above for `deploy/files/[environment].yml`. However, this has the
+steps above for `deploy/files/.env.[environment]`. However, this has the
 drawback that the secrets will be in plaintext in your container image.
 For most applications, that is secure enough because [AWS ECR stores images
 encrypted](https://aws.amazon.com/ecr/faqs/) and it is assumed the server
 you deploy from (which builds and caches Docker images) is secure.
 
-Once you figure out which files to encrypte, uncomment the lines in
-`.gitignore` that ignore secret files, since you'll be checking them in encrypted.
-
-
 ---
 
 ## git-crypt
 
-For deployment secrets, another option for encryption is
+For runtime or deployment secrets, another option for encryption is
 [git crypt](https://github.com/AGWA/git-crypt),
 which encrypt secrets when they are committed to Git.
 However, this leaves secrets unencrypted in the filesystem where the
@@ -68,11 +65,13 @@ repository is checked out. That can be advantage as it is easier
 to edit and search secret files.
 
 If you set up git-crypt, uncomment the lines in `.gitignore` that ignore
-secret files, since they will be encrypted in the repository. Also uncomment
-the lines in `.gitattributes` that specify which files to encrypt.
+secret files, since they will be encrypted in the repository (see below).
+Also uncomment the lines in `.gitattributes` that specify which files to encrypt.
 
 The disadvantage of using git-crypt is that if the machine or disk that
 contains these secret files is compromised, those secrets can be exposed.
+
+---
 
 ## Runtime secrets with AWS Secrets Manager
 
@@ -83,8 +82,9 @@ Step 1: Log into [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/) 
 the AWS Console. Create a secrets object with key/value pairs for each resource
 you want to store secrets for.
 
-    For example, you could create a secrets object named "myorg/myapp/production/db" that contains
-    the following keys:
+For example, you could create a secrets object named "myorg/myapp/production/db" that contains
+the following keys:
+
     - host
     - port
     - db_name
@@ -115,8 +115,8 @@ where you would substitute "us-west-1" with the region you stored your secret,
 "012345678901" with your AWS account number, and "myorg/myapp/production" with
 the path that your secrets are stored in.
 
-If you are deploying your task using ECS, the role should also have a trust relationship
-so that ECS can assume it:
+If you are deploying your task using ECS, the role should also have a
+trust relationship so that ECS can assume it:
 
     {
       "Version": "2012-10-17",
@@ -136,7 +136,7 @@ so that ECS can assume it:
     }
 
 See the official AWS documentation
-(IAM Roles for Tasks)[https://docs.aws.amazon.com/AmazonECS/latest/userguide/task-iam-roles.html]
+[IAM Roles for Tasks](https://docs.aws.amazon.com/AmazonECS/latest/userguide/task-iam-roles.html)
 for more details.
 
 Once you've created the role, record the ARN which should look like:
@@ -173,7 +173,7 @@ from `deploy/vars/example.yml`), add the following block under "default_env_task
 Then the environment variables DB_HOST, DB_PORT, DB_USERNAME, and DB_PASSWORD
 will be populated at runtime.
 
-You can also remove the "-BHyuR" suffix from your secret ARNs if you want your task
+You can also remove the suffix (in the above example, "-BHyuR") from your secret ARNs if you want your task
 to fetch the latest value of your secret, instead of a fixed value.
 
 Step 4: Finally, ensure that your program runs with the IAM role you set up in step 2.
@@ -195,3 +195,19 @@ and inject them into your program's environment. It's up to your program to read
 environment variables and configure things from there.
 
 ---
+
+## Modifying .gitignore
+
+Once you figure out which files to encrypt, comment out the lines in
+`.gitignore` that ignore secret files, since you'll be checking them in encrypted:
+
+    # Comment out to enable deployment secrets to be committed encrypted,
+    # if deploying with Docker:
+    # deploy/docker_deploy.env
+    # deploy/docker_deploy.*.env
+
+    # Comment out to enable deployment secrets to be committed encrypted
+    # deploy/vars/*.yml
+
+    # Comment out to enable runtime secrets to be committed encrypted
+    # deploy/files/.env.*
