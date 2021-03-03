@@ -95,7 +95,9 @@ After storing the secret, copy the ARN of the secret. It should look like:
 
     arn:aws:secretsmanager:us-west-2:012345678901:secret:myorg/myapp/production/db-BHyuR
 
-Step 2: Next, create a IAM Role that is has permission to access your secret.
+Step 2: Next, go to the
+[IAM Dashboard](https://console.aws.amazon.com/iam/home?region=us-west-2#)
+in the AWS console and create a IAM Role that is has permission to access your secret.
 It should have a policy that looks like this:
 
     {
@@ -153,7 +155,7 @@ That way your program doesn't need to fetch and parse the secrets itself.
 
 You can follow the instructions in the proc_wrapper
 [README.md](https://github.com/CloudReactor/cloudreactor-procwrapper/blob/main/README.md) if setting up
-your project yourself, or you can use the [example project](https://github.com/CloudReactor/cloudreactor-ecs-quickstart)
+your project yourself, or you can use an [example project](https://github.com/CloudReactor/cloudreactor-ecs-quickstart)
 which has deployment to ECS Fargate with CloudReactor management setup.
 
 Let's assume you are using an example project, and that you want to deploy a task that reads the
