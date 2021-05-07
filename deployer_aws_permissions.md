@@ -29,7 +29,7 @@ For instructions on how to do that, see the
 main project page for [aws-role-template](https://github.com/CloudReactor/aws-role-template/).
 
 Once you have the access key and secret key output by the template,
-you can add them to `deploy/docker_deploy.env` if using the Docker Deployment
+you can add them to `deploy/deploy.env` if using the Docker Deployment
 method. If you're using the Native Deployment method, configure the
 AWS CLI to use them using `aws configure`, or give your EC2 instance
 that you deploy from the instance role output by the template.

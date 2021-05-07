@@ -8,3 +8,6 @@ ga_tracking: UA-165860121-1
 aux_links:
   "CloudReactor.io":
     - "https://www.cloudreactor.io"
+
+kramdown:
+  auto_ids: true

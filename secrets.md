@@ -7,13 +7,13 @@ nav_order: 6
 # Secret management
 {: .no_toc}
 
-If you forked or cloned an example CloudReactor quick start project, you most likely added sensitive data to per-environment files, which you don't want to commit in plaintext. The default configuration assumes you just keep those secret files locally and don't commit them -- thus they are excluded in .gitignore.
+If you forked an example CloudReactor quick start project, you most likely added sensitive data to per-environment files, which you don't want to commit in plaintext. The default configuration assumes you just keep those secret files locally and don't commit them -- thus they are excluded in .gitignore.
 
 However, for sharing with a team or to have the secrets in source control for backup/history reasons, it's better to check the secret files in, but encrypted. Alternatively, you can get secrets from AWS at runtime.
 
 Here, we'll cover the management of 2 types of secrets:
-* Deployment secrets: these are secrets needed to deploy your task, but are not required while the task is running. For example, to deploy tasks using CloudReactor, you add AWS keys to the file `deploy/docker_deploy.env`, and your CloudReactor API key to the file `deploy/vars/<environment>.yml` (where "<environment>" is the name of a Run Environment in CloudReactor).
-* Runtime secrets: these are secrets that your task uses while it is running. Examples are database passwords and API keys for 3rd party services your task uses. In the example projects, the file `deploy/files/.env.<environment>` contains runtime secrets. In the python example project,
+* Deployment secrets: these are secrets needed to deploy your task, but are not required while the task is running. For example, to deploy tasks using CloudReactor, you add AWS keys to the file `deploy.env`, and your CloudReactor API key to the file `deploy_config/vars/<environment>.yml` (where "<environment>" is the name of a Run Environment in CloudReactor).
+* Runtime secrets: these are secrets that your task uses while it is running. Examples are database passwords and API keys for 3rd party services your task uses. In the example projects, the file `deploy_config/files/.env.<environment>` contains runtime secrets. In the python example project,
 python tasks read this file at runtime using the [python-dotenv](https://github.com/theskumar/python-dotenv) library.
 
 Three methods of managing secrets that we'll cover are:
@@ -31,7 +31,7 @@ which is well integrated with ansible. Ansible is used to deploy the
 example projects, and it will transparently decrypt files encrypted with
 ansible-vault when copying them.
 
-In the example projects, to use ansible-vault to encrypt your deployment secrets, change your directory to `/deploy/vars` and run:
+In the example projects, to use ansible-vault to encrypt your deployment secrets, change your directory to `/deploy_config/vars` and run:
 
     ansible-vault encrypt [environment].yml
 
@@ -39,15 +39,21 @@ ansible-vault will prompt for a password, then encrypt the file. To edit it:
 
     ansible-vault edit [environment].yml
 
-Next, change the deployment script `deploy.sh` to get the encryption password,
-either from user input, or an external file or script. Detailed instructions
-are in `deploy.sh`. You can also modify `deploy/ansible.cfg` to specify an
+Next, in `docker-deploy.sh`, change the
+
+to get the encryption password,
+either from user input, or an external file or script.
+
+
+
+Detailed instructions
+are in `deploy.sh`. You can also modify `deploy_config/ansible.cfg` to specify an
 external file tha contains the encryption password. See this
 [tutorial](https://www.digitalocean.com/community/tutorials/how-to-use-vault-to-protect-sensitive-ansible-data-on-ubuntu-16-04) for more
 details.
 
 You can also use Ansible Vault to encrypt runtime secrets, by following the
-steps above for `deploy/files/.env.[environment]`. However, this has the
+steps above for `deploy_config/files/.env.[environment]`. However, this has the
 drawback that the secrets will be in plaintext in your container image.
 For most applications, that is secure enough because [AWS ECR stores images
 encrypted](https://aws.amazon.com/ecr/faqs/) and it is assumed the server
@@ -161,8 +167,8 @@ which has deployment to ECS Fargate with CloudReactor management setup.
 Let's assume you are using an example project, and that you want to deploy a task that reads the
 database to the "production" CloudReactor Run Environment.
 
-Then, in the `deploy/vars/production.yml` file (if it doesn't exist, copy
-from `deploy/vars/example.yml`), add the following block under "default_env_task_config"
+Then, in the `deploy_config/vars/production.yml` file (if it doesn't exist, copy
+from `deploy_config/vars/example.yml`), add the following block under "default_env_task_config"
 
     default_env_task_config:
       env:
@@ -180,7 +186,7 @@ to fetch the latest value of your secret, instead of a fixed value.
 
 Step 4: Finally, ensure that your program runs with the IAM role you set up in step 2.
 If running in ECS, you'll want to use the role as the "Task Role". If you are starting from
-an example project, uncomment/edit the following lines in `deploy/vars/production.yml`:
+an example project, uncomment/edit the following lines in `deploy_config/vars/production.yml`:
 
     default_env_task_config:
       command: "python src/task_1.py"
@@ -205,11 +211,11 @@ Once you figure out which files to encrypt, comment out the lines in
 
     # Comment out to enable deployment secrets to be committed encrypted,
     # if deploying with Docker:
-    # deploy/docker_deploy.env
-    # deploy/docker_deploy.*.env
+    # deploy/deploy.env
+    # deploy/deploy.*.env
 
     # Comment out to enable deployment secrets to be committed encrypted
-    # deploy/vars/*.yml
+    # deploy_config/vars/*.yml
 
     # Comment out to enable runtime secrets to be committed encrypted
-    # deploy/files/.env.*
+    # deploy_config/files/.env.*
