@@ -16,7 +16,7 @@ In a Windows command prompt, run:
 
     deploy_shell.cmd <environment>
 
-These commands will take you to a bash shell inside the deployer Docker container where you can re-run the deployment script with `./deploy.sh` and inspect the files it produces in the `build/` directory.
+These commands will take you to a bash shell inside the deployer Docker container where you can re-run the deployment script with `./cr_deploy.sh` and inspect the files it produces in the `build/` directory.
 
 ## Common errors
 

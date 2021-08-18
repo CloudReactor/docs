@@ -59,7 +59,7 @@ To remove a Task, delete the Tasks within the
 This will remove the Task rom AWS also.
 
 You should also remove the reference to the Tasks in `./deploy/vars/common.yml`.
-- If you don't, if you run `./deploy.sh [environment]` (without task names), this will (re-)push all tasks -- which might include tasks you had intended to remove.
+- If you don't, if you run `./cr_deploy.sh [environment]` (without task names), this will (re-)push all tasks -- which might include tasks you had intended to remove.
 
 You may also want to remove the task code itself from `/src/`
 

@@ -120,8 +120,8 @@ Now let's work on the build and deployment process. If you need to add custom
 build steps, such as compilation, see
 [Build Customization](/build_customization.html).
 
-Following that, copy and optionally modify `deploy.sh`
-(or `deploy.cmd` and `docker-compose-deploy.yml` if you are working on a
+Following that, copy and optionally modify `cr_deploy.sh`
+(or `cr_deploy.cmd` and `docker-compose-deploy.yml` if you are working on a
 Windows machine) from the
 [aws-ecs-cloudreactor-deploy](https://github.com/CloudReactor/aws-ecs-cloudreactor-deployer)
 repository into your project root directory.
@@ -177,11 +177,11 @@ instance profile that has deployment permissions, you can leave this file blank.
 
 Finally, deploy. In a bash shell, run:
 
-    ./deploy.sh <environment> [TASK_NAMES]
+    ./cr_deploy.sh <environment> [TASK_NAMES]
 
 or in Windows:
 
-    .\deploy.cmd <environment> [TASK_NAMES]
+    .\cr_deploy.cmd <environment> [TASK_NAMES]
 
 where `TASK_NAMES` is an optional, comma-separated list of Tasks to deploy.
 If omitted, all tasks defined in `./deploy/vars/common.yml` will be deployed.

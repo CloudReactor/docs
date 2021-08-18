@@ -284,7 +284,7 @@ which has deployment to ECS Fargate with CloudReactor management setup.
 Let's assume you want to deploy a task that reads the database to the
 "production" CloudReactor Run Environment. Then, in the
 `deploy_config/vars/production.yml` file (if it doesn't exist, copy
-from `deploy_config/vars/example.yml`), add the following block under "default_env_task_config"
+from `deploy_config/vars/example.yml`), add the `env_locations` property:
 
       default_env_task_config:
         ...
@@ -296,20 +296,22 @@ from `deploy_config/vars/example.yml`), add the following block under "default_e
 Then the environment variables DB_HOST, DB_PORT, DB_USERNAME, and DB_PASSWORD
 will be populated at runtime by the proc_wrapper module.
 
-You can also remove the suffix (in the above example, "-BHyuR") from your secret
+You can also remove the suffix (in the above example, `-BHyuR`) from your secret
 ARNs if you want your Task to fetch the latest value of your secret, instead of
 a pinned value.
 
 Step 4: Finally, ensure that your program runs with the IAM role you set up in
 step 2.
 If running in ECS, you'll want to use the role as the "Task Role". If you are starting from
-an example project, add the following lines in `deploy_config/vars/production.yml`:
+an example project, add the `role_arn` property in
+`deploy_config/vars/production.yml`:
 
     default_env_task_config:
       ...
-      command: "python src/task_1.py"
       ecs:
+        ...
         task:
+          ...
           role_arn: "arn:aws:iam::012345678901:role/myapp-task-role-production"
 
 If running in EC2, ensure the EC2 instances you run your program in have the instance role you created in step 2.
