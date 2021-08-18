@@ -7,7 +7,7 @@ nav_order: 6
 # Secret management
 {: .no_toc}
 
-If you are using an example CloudReactor quick start project, like
+If you are using a CloudReactor quick start project, like
 [cloudreactor-python-ecs-quickstart](https://github.com/CloudReactor/cloudreactor-python-ecs-quickstart),
 you most likely added sensitive data to per-environment files, which you don't
 want to commit in plaintext. The default configuration assumes you just keep
@@ -27,8 +27,6 @@ uses. In the example projects, the file `deploy_config/files/.env.<environment>`
 contains runtime secrets. In the python example project, python tasks read this
 file at runtime using the
 [python-dotenv](https://github.com/theskumar/python-dotenv) library.
-
-Three methods of managing secrets that we'll cover are:
 
 1. TOC
 {:toc}
@@ -99,7 +97,7 @@ In that case, your `deploy.sh` would look like:
 
 ### Using deployment secrets encrypted with Ansible Vault
 
-Once you inject the Ansible Vault passphrases into the deployer image,
+Once you inject the Ansible Vault passphrase into the deployer image,
 Ansible will be able to read files encrypted with ansible-vault, and you
 can reference variables defined in those files in any task or template
 that it uses. For example you might encrypt the file
@@ -119,8 +117,8 @@ The default deployment tasks will then be able to use the value of
 
 To inject the artifactory credentials, add this to `deploy_config/vars/common.yml`:
 
-default_build_options:
-  extra_docker_build_args: "--build-arg ARTIFACTORY_USER={{artifactory.username | quote}} --build-arg ARTIFACTORY_PASSWORD={{artifactory.password | quote}}"
+    default_build_options:
+      extra_docker_build_args: "--build-arg ARTIFACTORY_USER={{artifactory.username | quote}} --build-arg ARTIFACTORY_PASSWORD={{artifactory.password | quote}}"
 
 Then in your `Dockerfile` you can use the build args:
 
