@@ -19,7 +19,7 @@ for backup/history reasons, it's better to check the secret files in, but
 encrypted. Alternatively, you can get secrets from AWS at runtime.
 
 Here, we'll cover the management of 2 types of secrets:
-* Deployment secrets: these are secrets needed to deploy your Task, but are not required while the task is running. For example, to deploy tasks using CloudReactor, you add AWS keys to the file `deploy.env`, and your CloudReactor API key to the file `deploy_config/vars/<environment>.yml` (where "<environment>" is the name of a Run Environment in CloudReactor).
+* Deployment secrets: these are secrets needed to deploy your Task, but are not required while the task is running. For example, to deploy tasks using CloudReactor, you add AWS keys to the file `deploy.env`, and your CloudReactor API key to the file `deploy_config/vars/<environment>.yml` (where `<environment>` is the name of a Run Environment in CloudReactor).
 
 * Runtime secrets: these are secrets that your Task uses while it is running.
 Examples are database passwords and API keys for 3rd party services your Task
@@ -60,9 +60,8 @@ Next, create a file `deploy.sh` with the following contents:
     # configuration in ~/.aws
     # export USE_USER_AWS_CONFIG="TRUE"
 
-    export EXTRA_ANSIBLE_OPTIONS="--vault-password-file /work/deploy_config/vault_pass.sh"
-    # Optional: use to pin the version of the deployer
-    # export DOCKER_IMAGE_TAG="1.4.0"
+    export EXTRA_ANSIBLE_OPTIONS="--vault-password-file /work/fromhost/vault_pass.sh"
+
 
     ./cr_deploy.sh "$@"
 
@@ -90,8 +89,8 @@ In that case, your `deploy.sh` would look like:
         export DEPLOYMENT_ENVIRONMENT=$1
     fi
 
-    export EXTRA_DOCKER_RUN_OPTIONS="-v $HOME/vault/$DEPLOYMENT_ENVIRONMENT/vault_pass.txt:/work/deploy_config/vault_pass.txt"
-    export EXTRA_ANSIBLE_OPTIONS="--vault-password-file /work/deploy_config/vault_pass.txt"
+    export EXTRA_DOCKER_RUN_OPTIONS="-v $HOME/vault/${DEPLOYMENT_ENVIRONMENT}/vault_pass.txt:/work/fromhost/vault_pass.txt"
+    export EXTRA_ANSIBLE_OPTIONS="--vault-password-file /work/fromhost/vault_pass.txt"
 
     ./cr_deploy.sh "$@"
 
@@ -131,7 +130,7 @@ Then in your `Dockerfile` you can use the build args:
 ### Using runtime secrets encrypted with Ansible Vault
 
 You can also use Ansible Vault to encrypt runtime secrets, by encrypting
-`deploy_config/files/.env.[environment]` and having ansible copy the
+`deploy_config/files/.env.<environment>` and having ansible copy the
 file into your Docker context in `deploy_config/hooks/pre_build.yml`:
 
     - name: Copy runtime .env file read by application
@@ -332,8 +331,8 @@ Once you figure out which files to encrypt, comment out the lines in
 
     # Comment out to enable deployment secrets to be committed encrypted,
     # if deploying with Docker:
-    # deploy/deploy.env
-    # deploy/deploy.*.env
+    # deploy.env
+    # deploy.*.env
 
     # Comment out to enable deployment secrets to be committed encrypted
     # deploy_config/vars/*.yml
