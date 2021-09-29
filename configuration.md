@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Task Configuration for aws-ecs-cloudreactor-deploy
-nav_order: 4
+nav_order: 6
 ---
 # Task configuration for aws-ecs-cloudreactor-deploy
 
