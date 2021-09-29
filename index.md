@@ -104,20 +104,21 @@ follow the instructions for
 then proceed with the steps below.
 
 ### Create a CloudReactor API Key
+{: #create-api-key }
 
 Now, create an API key your Task will use to authenticate with CloudReactor.
 Select your username in the upper right corner of the dashboard,
 then in the popup menu, select `API Keys`. On the following page, hit the
 button labeled `Add a new API key ...`. On the following page,
 
-1. Give your API key a name,
+1. Give your API key a name.
 2. Choose the Run Environment you just created. You may also choose `Any`
 if you want to reuse the API key in different Run Environments.
-3. Select `Developer` Access Level of  as your program will create a Task
+3. Select `Developer` Access Level of as your program will create a Task
 in CloudReactor the first time it is run.
-4. Hit the `Save` button
-5. You will be taken back a list of your API keys. On the row with the key you
-just created, use the copy button to copy the API key to your clipboard.
+4. Hit the `Save` button.
+5. You will be taken back a list of your API keys. On the row with the key
+you just created, use the copy button to copy the API key to your clipboard.
 
 ### Set environment variables
 
@@ -129,8 +130,7 @@ passive Task is:
 CloudReactor
 * `PROC_WRAPPER_API_KEY` - set to the value of the API key you created above
 * `PROC_WRAPPER_AUTO_CREATE_TASK=TRUE`
-* `PROC_WRAPPER_AUTO_CREATE_TASK_RUN_ENVIRONMENT_NAME` - set to the name of the
-Run Environment you created above
+* `PROC_WRAPPER_AUTO_CREATE_TASK_RUN_ENVIRONMENT_NAME` - set to the name of the Run Environment you created above
 * `PROC_WRAPPER_TASK_IS_PASSIVE=TRUE`
 * `PROC_WRAPPER_SEND_RUNTIME_METADATA=TRUE`
 
@@ -197,7 +197,7 @@ See the [notifications guide](notifications.html) for instructions.
 [secret management](/secrets.md)
 * To allow CloudReactor to start Tasks on your behalf, thus enabling
 manual starting in the dashboard, and Workflows, follow the
-[simple integration level](simple_integration.html)
+[full integration level](full_integration.html)
 instructions
 
 ---

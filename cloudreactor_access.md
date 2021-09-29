@@ -1,9 +1,9 @@
 ---
 layout: default
-title: Granting CloudReactor Task Managment Acesss
+title: Granting CloudReactor Task Management Acesss
 nav_order: 3
 ---
-# Granting CloudReactor Task Managment Access
+# Granting CloudReactor Task Management Access
 
 ## Background
 

@@ -207,7 +207,8 @@ After storing the secret, copy the ARN of the secret. It should look like:
 
 If want to automate secrets being uploaded to Secrets Manager, two options are:
 
-1. Use the [CloudReactor deployer image](https://github.com/CloudReactor/aws-ecs-cloudreactor-deployer), to upload (locally encypted) secrets to Secrets Manager during
+1. Use the [CloudReactor deployer image](https://github.com/CloudReactor/aws-ecs-cloudreactor-deployer), to upload (locally encypted) secrets to
+Secrets Manager during
 deployment. The example projects already use this image, and have the upload
 step commented out in [`deploy_config/hooks/pre_build.yml`](https://github.com/CloudReactor/cloudreactor-python-ecs-quickstart/blob/ebb68102b45d32613316692b846e6bb107a1388a/deploy_config/pre_build.yml#L18).
 2. [Use Terraform to set secret values](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret)

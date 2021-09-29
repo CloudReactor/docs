@@ -14,7 +14,7 @@ CloudReactor provides a simple way to deploy, monitor, manage and orchestrate ta
 ## How is CloudReactor different from other schedulers?
 
 We aim to make the end-to-end developer experience as painless as possible.
-- Minimize developer headaches: our Quickstart repo comes with a Docker python container. Containerisation ensures that all engineers on your team can develop in an identical environment -- and that the production instance will also be the same.
+- Minimize developer headaches: our Quickstart repo comes with a Docker python container. Containerization ensures that all engineers on your team can develop in an identical environment -- and that the production instance will also be the same.
 - Deploying to AWS ECS: deploy to AWS with just a single command.
 - Running tasks on ECS Fargate: ECS Fargate is serverless, which eliminates server maintenance and reduces cost ([see below for more](#why-should-i-use-ecs))
 - Monitoring and managing tasks: the CloudReactor SaaS dashboard allows you to view historical executions, change run schedules and stop / start tasks with just a few clicks. Once CloudReactor has been integrated with a PagerDuty account or email profile,
