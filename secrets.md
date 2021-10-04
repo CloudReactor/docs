@@ -19,14 +19,14 @@ for backup/history reasons, it's better to check the secret files in, but
 encrypted. Alternatively, you can get secrets from AWS at runtime.
 
 Here, we'll cover the management of 2 types of secrets:
-* Deployment secrets: these are secrets needed to deploy your Task, but are not required while the task is running. For example, to deploy tasks using CloudReactor, you add AWS keys to the file `deploy.env`, and your CloudReactor API key to the file `deploy_config/vars/<environment>.yml` (where `<environment>` is the name of a Run Environment in CloudReactor).
+* Deployment secrets: these are secrets needed to deploy your Task, but are not required while the Task is running. For example, to deploy Tasks using CloudReactor, you add AWS keys to the file `deploy.env`, and your
+CloudReactor Deploy API key to the file `deploy_config/vars/<environment>.yml` (where `<environment>` is the name of a Run Environment in CloudReactor).
 
 * Runtime secrets: these are secrets that your Task uses while it is running.
 Examples are database passwords and API keys for 3rd party services your Task
-uses. In the example projects, the file `deploy_config/files/.env.<environment>`
-contains runtime secrets. In the python example project, python tasks read this
-file at runtime using the
-[python-dotenv](https://github.com/theskumar/python-dotenv) library.
+uses. These typically are injected as environment variables that your Task
+reads. Using [proc_wrapper](https://github.com/CloudReactor/cloudreactor-procwrapper) to fetch secrets and populate the environment is
+a convenient way inject secrets.
 
 1. TOC
 {:toc}
@@ -35,20 +35,25 @@ file at runtime using the
 
 ## Ansible Vault
 
-One option for managing either deployment or runtime secrets is to use
+One option for managing either deployment secrets is to use
 [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
 which is well integrated with ansible. Ansible is used to deploy the
 example projects, and it will transparently decrypt files encrypted with
 ansible-vault when copying them.
 
 In the example projects, to use ansible-vault to encrypt your deployment
-secrets, change your directory to `/deploy_config/vars` and run:
+secrets, first create a password (method from [howtogeek](https://www.howtogeek.com/howto/30184/10-ways-to-generate-a-random-password-from-the-command-line/))
+in a directory outside your project. The example below use `$HOME/secrets`:
 
-    ansible-vault encrypt [environment].yml
+< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c64 > vault_pass.txt
+
+Then change your directory to `deploy_config/vars` and run:
+
+    ansible-vault encrypt --vault-password-file $HOME/secrets/vault_pass.txt [environment].yml
 
 ansible-vault will prompt for a password, then encrypt the file. To edit it:
 
-    ansible-vault edit [environment].yml
+    ansible-vault edit --vault-password-file $HOME/secrets/vault_pass.txt [environment].yml
 
 Next, create a file `deploy.sh` with the following contents:
 
@@ -56,47 +61,45 @@ Next, create a file `deploy.sh` with the following contents:
 
     set -e
 
-    # Optional: if you want to allow the deployer image to use your AWS
-    # configuration in ~/.aws
-    # export USE_USER_AWS_CONFIG="TRUE"
-
-    export EXTRA_ANSIBLE_OPTIONS="--vault-password-file /work/fromhost/vault_pass.sh"
-
+    export ANSIBLE_VAULT_PASSWORD=`cat ../secrets/vault_pass.txt`
+    EXTRA_DOCKER_RUN_OPTIONS="-e ANSIBLE_VAULT_PASSWORD"
 
     ./cr_deploy.sh "$@"
 
-Then create the bash script `deploy_config/vault_pass.sh` to read the Ansible vault
-passphrase and send it to standard out. For example, to read from an AWS S3
-bucket:
+What's going on under the hood? The deployer image contains a special script
+(`ansible/vault_pass_from_env.sh`)
+that will be used when `ANSIBLE_VAULT_PASSWORD` is defined. The script is used
+as the Ansible Vault password file, and simply outputs the value of
+`ANSIBLE_VAULT_PASSWORD`.
+
+To deploy, just use your custom `deploy.sh` instead of `cr_deploy.sh`:
+
+    ./deploy.sh <deployment_environment>
+
+It may be more convenient to have deployer container to fetch the
+Ansible Vault password, because it has access to your AWS environment and
+tools like the AWS CLI. For example, to have the container fetch the password
+from an AWS S3 object, create the bash script `deploy_config/vault_pass.sh`:
 
     #!/bin/bash
     echo `aws s3 cp s3://mygroup/settings/ansible/vault_pass.$DEPLOYMENT_ENVIRONMENT.txt -`
 
-which would read the object `s3://mygroup/settings/ansible/vault_pass.staging.text`
-if the deployment environment passed to `deploy.sh` is `staging`.
+(`$DEPLOYMENT_ENVIRONMENT` will resolve to the deployment environment you pass
+to `cr_deploy.sh`.)
 
-Alternatively, you can pass the filename of a file containing the passphrase
-itself, ensuring that you volume mount it into the container's filesystem.
-In that case, your `deploy.sh` would look like:
+Then your custom `deploy.sh` would like this:
 
     #!/usr/bin/env bash
 
-    if [ -z "$1" ]
-      then
-        echo "Usage: $0 <deployment> [task_names]"
-        exit 1
-      else
-        export DEPLOYMENT_ENVIRONMENT=$1
-    fi
+    set -e
 
-    export EXTRA_DOCKER_RUN_OPTIONS="-v $HOME/vault/${DEPLOYMENT_ENVIRONMENT}/vault_pass.txt:/work/fromhost/vault_pass.txt"
-    export EXTRA_ANSIBLE_OPTIONS="--vault-password-file /work/fromhost/vault_pass.txt"
+    export EXTRA_ANSIBLE_OPTIONS="--vault-password-file /work/deploy_config/vault_pass.sh"
 
     ./cr_deploy.sh "$@"
 
 ### Using deployment secrets encrypted with Ansible Vault
 
-Once you inject the Ansible Vault passphrase into the deployer image,
+Once you inject the Ansible Vault password into the deployer image,
 Ansible will be able to read files encrypted with ansible-vault, and you
 can reference variables defined in those files in any task or template
 that it uses. For example you might encrypt the file
@@ -114,7 +117,8 @@ that it uses. For example you might encrypt the file
 The default deployment tasks will then be able to use the value of
 `cloudreactor.deploy_api_key` when connecting to CloudReactor.
 
-To inject the artifactory credentials, add this to `deploy_config/vars/common.yml`:
+To inject secrets available for your Dockerfile to use, add something like
+this to `deploy_config/vars/common.yml`:
 
     default_build_options:
       extra_docker_build_args: "--build-arg ARTIFACTORY_USER={{artifactory.username | quote}} --build-arg ARTIFACTORY_PASSWORD={{artifactory.password | quote}}"
@@ -127,44 +131,11 @@ Then in your `Dockerfile` you can use the build args:
     RUN ./gradlew shadowJar -Partifactory_user="${ARTIFACTORY_USER}" -Partifactory_password="${ARTIFACTORY_PASSWORD}"
     ...
 
-### Using runtime secrets encrypted with Ansible Vault
-
-You can also use Ansible Vault to encrypt runtime secrets, by encrypting
-`deploy_config/files/.env.<environment>` and having ansible copy the
-file into your Docker context in `deploy_config/hooks/pre_build.yml`:
-
-    - name: Copy runtime .env file read by application
-      copy: |
-        src=deploy_config/files/.env.{{env}}
-        dest=docker_context/build/.env
-
-Then your Dockerfile can copy the file into the image:
-
-    ARG ENV_FILE_PATH=build/.env
-    COPY ${ENV_FILE_PATH} .env
-
-Then you can have the proc_wrapper module inject the environment variables
-set in the .env file, by specifying the secret location in `common.yml`:
-
-    default_task_config:
-      ...
-      wrapper:
-        ...
-        env_locations:
-          - file:///home/appuser/app/.env
-
-
-However, using Ansible Vault for runtime secrets has the
-drawback that the secrets will be saved in plaintext in your container image.
-For most applications, that is secure enough because [AWS ECR stores images
-encrypted](https://aws.amazon.com/ecr/faqs/) and it is assumed the server
-you deploy from (which builds and caches Docker images) is secure.
-
 ---
 
 ## git-crypt
 
-For runtime or deployment secrets, another option for encryption is
+For deployment secrets, another option for encryption is
 [git crypt](https://github.com/AGWA/git-crypt),
 which encrypt secrets when they are committed to Git.
 However, this leaves secrets unencrypted in the filesystem where the
@@ -184,17 +155,34 @@ selected to be encrypted.
 ## Runtime secrets with AWS Secrets Manager
 
 If you are running your tasks in AWS, one option for runtime secrets
-is to store them in AWS Secrets Manager. Then you don't need to store
-secrets at all in your source repository, only locations of secrets.
+is to store them in AWS Secrets Manager. When your Task runs, it can use
+[proc_wrapper](https://github.com/CloudReactor/cloudreactor-procwrapper]) to
+fetch the secrets from Secrets Manager and inject them into your Tasks's
+process environment. Or your Task can fetch the secrets itself.
+If you use Secrets Manager, then you don't need to store
+secrets at all in your source repository, only locations of secrets in
+Secrets Manager. You can also use Ansible Vault or git-crypt to encrypt
+runtime secrets in your repository, and use the deployer image to store them in
+Secrets Manager as part of the deployment process.
 
-Step 1: Log into [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)
-in the AWS Console. Create a secrets object as plaintext, in .env, json, or yaml
-format.
+### Storing secrets separately from deployment
 
-For example, to use the .env format, you would create a secrets object named
+If you don't want to store secrets as part of the deployment process,
+you can store them in AWS Secrets Manager by using the AWS Management Console
+or Terraform.
+
+#### Using the AWS Management Console
+
+To use the AWS Management Console, log into
+[AWS Secrets Manager](https://aws.amazon.com/secrets-manager/). Create a secrets
+value as plaintext, in .env, JSON, or YAML format.
+
+For example, to use the .env format (recommended if you are using proc_wrapper),
+you would create a secrets value named
 "myorg/myapp/production/db.env" that contains the following environment
 variables:
 
+    PROC_WRAPPER_API_KEY="xxx"
     DB_HOST=db.example.com
     DB_PORT=5432
     DB_NAME=mydb
@@ -205,19 +193,85 @@ After storing the secret, copy the ARN of the secret. It should look like:
 
     arn:aws:secretsmanager:us-west-1:012345678901:secret:myorg/myapp/production/db.env-BHyuR
 
-If want to automate secrets being uploaded to Secrets Manager, two options are:
+#### Using Terraform
 
-1. Use the [CloudReactor deployer image](https://github.com/CloudReactor/aws-ecs-cloudreactor-deployer), to upload (locally encypted) secrets to
-Secrets Manager during
-deployment. The example projects already use this image, and have the upload
-step commented out in [`deploy_config/hooks/pre_build.yml`](https://github.com/CloudReactor/cloudreactor-python-ecs-quickstart/blob/ebb68102b45d32613316692b846e6bb107a1388a/deploy_config/pre_build.yml#L18).
-2. [Use Terraform to set secret values](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret)
+Alternatively, if you want to keep your infrastructure definitions and secrets
+in source control, you can
+[use Terraform to set secret values](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret).
+
+Due to the available functions in Terraform, it may be easier to store secrets
+in JSON format. For example, in a `variables.tf` file:
+
+    variable "task_secrets" {
+      description = "Secrets for MyApp tasks"
+      type = map(string)
+    }
+
+In the main `app.tf` file:
+
+    resource "aws_secretsmanager_secret" "task_secrets" {
+      name = "myorg/myapp/staging/config.json"
+    }
+
+    resource "aws_secretsmanager_secret_version" "task_secrets_value" {
+      secret_id     = aws_secretsmanager_secret.task_secrets.id
+      secret_string = jsonencode(var.task_secrets)
+    }
+
+And finally in a `staging_secrets.auto.tfvars` file:
+
+    task_secrets = {
+        PROC_WRAPPER_API_KEY = "xxx"
+
+        DB_HOST = "db.example.com"
+        DB_PORT = "5432"
+        DB_NAME = "mydb"
+        DB_USERNAME = "dbuser"
+        DB_PASSWORD = "dbpassword"
+    }
+
+`staging_secrets.auto.tfvars` could be encypted using git-crypt or using
+Ansible Vault if you use the
+[Ansible Vault Terraform provider](https://meilleursagents.github.io/terraform-provider-ansiblevault/).
+
+After you run `terraform plan` and `terraform apply`, copy the ARN for
+aws_secretsmanager_secret.task_secrets which should look like:
+
+    arn:aws:secretsmanager:us-west-1:012345678901:secret:myorg/myapp/production/db.config-BHyuR
+
+### Storing secrets as part of the deployment process
+
+Alternatively, you may want to manage secrets as part of the deployment process
+so that no separate step to set secrets is required.
+To automate secrets being uploaded to Secrets Manager during deployment,
+you can use the
+[CloudReactor deployer image](https://github.com/CloudReactor/aws-ecs-cloudreactor-deployer).
+The example projects already use this image, and have the upload
+step commented out in [`deploy_config/hooks/pre_build.yml`](https://github.com/CloudReactor/cloudreactor-python-ecs-quickstart/blob/ebb68102b45d32613316692b846e6bb107a1388a/deploy_config/pre_build.yml#L18):
 
 
-Step 2: Next, go to the
+    - name: Upload .env file to AWS Secrets Manager
+      community.aws.aws_secret:
+        name: '{{project_name}}/{{env}}/env'
+        state: present
+        secret_type: 'string'
+        secret: "{{ lookup('file', '/work/deploy_config/files/.env.' + env)  }}"
+      register: create_dotenv_secret_result
+
+### Giving your Task permission to access Secrets Manager
+
+Now you have to grant your Task permissions to access Secrets Manager at
+runtime. You can do this either manually in the AWS Management Console or
+with Terraform. The instructions below create an IAM Role with permissions,
+but you can also create an IAM user and use access keys.
+
+#### Granting permission to access secrets using the AWS Management Console
+
+Go to the
 [IAM Dashboard](https://console.aws.amazon.com/iam/home?region=us-west-2#)
-in the AWS console and create a IAM Role that is has permission to access your secret.
-It should have a policy that looks like this:
+in the AWS console and create a IAM Role that has permission to access your
+secret. In ECS, this role will be the Task Role that your Task runs with.
+Give the role a policy that looks like this:
 
     {
       "Version": "2012-10-17",
@@ -227,16 +281,17 @@ It should have a policy that looks like this:
             "secretsmanager:GetSecretValue"
         ],
         "Resource": [
-            "arn:aws:secretsmanager:us-west-1:01234567901:secret:myorg/myapp/production/*"
+            "arn:aws:secretsmanager:us-west-1:01234567901:secret:myorg/myapp/staging/*"
         ]
       }
     }
 
 where you would substitute "us-west-1" with the region you stored your secret,
-"012345678901" with your AWS account number, and "myorg/myapp/production" with
-the path that your secrets are stored in.
+"012345678901" with your AWS account number, and "myorg/myapp/staging" with
+the path that your secrets are stored in. You can also include additional
+permissions that your Task can use to access other AWS resources.
 
-If you are deploying your task using ECS, the role should also have a
+If you are deploying your Task using ECS, the role should also have a
 trust relationship so that ECS can assume it:
 
     {
@@ -260,15 +315,43 @@ See the official AWS documentation
 [IAM Roles for Tasks](https://docs.aws.amazon.com/AmazonECS/latest/userguide/task-iam-roles.html)
 for more details.
 
-It's also possible to [setup the role using Terraform](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role).
+### Granting permission to access secrets using Terraform
 
-Once you've created the role, record the ARN which should look like:
+It's also possible to [setup the role using Terraform](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role). The project
+[example_aws_infrastructure_terraform](https://github.com/CloudReactor/example_aws_infrastructure_terraform) shows how to setup a Task role with the
+necessary permissions.
 
-    arn:aws:iam::012345678901:role/myapp-task-role-production
+### Assigning the role to your Task
 
-which we will use in step 4.
+After either method above, record the ARN of the role you created,
+which should look like:
 
-Step 3: Now we can make those secrets available to your Tasks. You could have
+    arn:aws:iam::012345678901:role/myapp-task-role-staging
+
+If running in ECS, you'll want to use the role as the "Task Role". If you are
+using the CloudReactor deployer image,
+starting from, add the `role_arn` property in
+`deploy_config/vars/staging.yml`:
+
+    default_env_task_config:
+      ...
+      ecs:
+        ...
+        task:
+          ...
+          role_arn: "arn:aws:iam::012345678901:role/myapp-task-role-staging"
+
+If running in EC2, ensure the EC2 instances you run your program in have the
+instance role.
+See the official AWS documentation [IAM roles for Amazon EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html)
+for details.
+
+### Fetching secrets at runtime
+
+If necessary, modify the source code of your Task to ensure it reads all secret
+values from environment variables.
+
+Now we can make those secrets available to your Tasks. You could have
 your code fetch these secrets directly from AWS Secrets Manager and parse them. However, to avoid writing this code and depending on an AWS library, we
 recommend using the
 [proc_wrapper](https://github.com/CloudReactor/cloudreactor-procwrapper)
@@ -279,11 +362,11 @@ secrets itself.
 You can follow the instructions in the proc_wrapper
 [README.md](https://github.com/CloudReactor/cloudreactor-procwrapper/blob/main/README.md) if setting up
 your project yourself, or you can use an [example project](https://github.com/CloudReactor/cloudreactor-python-ecs-quickstart)
-which has deployment to ECS Fargate with CloudReactor management setup.
+which uses the deployer image to deploy to AWS ECS Fargate and CloudReactor.
 
 Let's assume you want to deploy a task that reads the database to the
-"production" CloudReactor Run Environment. Then, in the
-`deploy_config/vars/production.yml` file (if it doesn't exist, copy
+"staging" CloudReactor Run Environment. Then, in the
+`deploy_config/vars/staging.yml` file (if it doesn't exist, copy
 from `deploy_config/vars/example.yml`), add the `env_locations` property:
 
       default_env_task_config:
@@ -291,7 +374,7 @@ from `deploy_config/vars/example.yml`), add the `env_locations` property:
         wrapper:
           ...
           env_locations:
-            - arn:aws:secretsmanager:us-west-2:012345678901:secret:myorg/myapp/{{env}}/db.env-BHyuR
+            - arn:aws:secretsmanager:us-west-2:012345678901:secret:myorg/myapp/staging/db.env-BHyuR
 
 Then the environment variables DB_HOST, DB_PORT, DB_USERNAME, and DB_PASSWORD
 will be populated at runtime by the proc_wrapper module.
@@ -300,32 +383,24 @@ You can also remove the suffix (in the above example, `-BHyuR`) from your secret
 ARNs if you want your Task to fetch the latest value of your secret, instead of
 a pinned value.
 
-Step 4: Finally, ensure that your program runs with the IAM role you set up in
-step 2.
-If running in ECS, you'll want to use the role as the "Task Role". If you are starting from
-an example project, add the `role_arn` property in
-`deploy_config/vars/production.yml`:
+If you don't want to use proc_wrapper to fetch secrets, you can fetch secrets
+yourself. Some popular libraries for doing that include:
 
-    default_env_task_config:
-      ...
-      ecs:
-        ...
-        task:
-          ...
-          role_arn: "arn:aws:iam::012345678901:role/myapp-task-role-production"
+* [boto3](https://pypi.org/project/boto3/) for python
+* [AWS SDK for Java](https://aws.amazon.com/sdk-for-java/)
+* [AWS SDK for Go](https://aws.amazon.com/sdk-for-go/)
 
-If running in EC2, ensure the EC2 instances you run your program in have the instance role you created in step 2.
-See the official AWS documentation [IAM roles for Amazon EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html)
-for details.
+### Deploy
 
-Step 5: Deploy your project and the proc_wrapper module should be able to fetch
-and parse your secrets, and inject them into your program's environment. It's up
-to your program to read the environment variables and configure things from
-there.
+Finally, deploy your project. If you used the proc_wrapper module, it should be
+able to fetch and parse your secrets, and inject them into your program's
+environment.
 
 ---
 
-## Modifying .gitignore in quick start projects
+## Cleanup
+
+### Modifying .gitignore in example projects
 
 Once you figure out which files to encrypt, comment out the lines in
 `.gitignore` that ignore secret files, since you'll be checking them in encrypted:

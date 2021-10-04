@@ -18,7 +18,7 @@ features:
 
 To gain these features, you need to register your Task beforehand with
 the CloudReactor API. Below, we'll use the
-[aws-ecs-cloudreactor-deploy](https://github.com/CloudReactor/aws-ecs-cloudreactor-deployer)
+[aws-ecs-cloudreactor-deployer](https://github.com/CloudReactor/aws-ecs-cloudreactor-deployer)
 Docker image to deploy to ECS as well do the CloudReactor registration. (It's
 also possible to make API calls to create Tasks directly if you know the ECS
 task definition ARN, but we won't cover that here.)
