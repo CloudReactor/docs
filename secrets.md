@@ -33,7 +33,9 @@ a convenient way inject secrets.
 
 ---
 
-## Ansible Vault
+## Deployment Secrets
+
+### Ansible Vault
 
 One option for managing either deployment secrets is to use
 [Ansible Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
@@ -97,7 +99,7 @@ Then your custom `deploy.sh` would like this:
 
     ./cr_deploy.sh "$@"
 
-### Using deployment secrets encrypted with Ansible Vault
+#### Using deployment secrets encrypted with Ansible Vault
 
 Once you inject the Ansible Vault password into the deployer image,
 Ansible will be able to read files encrypted with ansible-vault, and you
@@ -133,7 +135,7 @@ Then in your `Dockerfile` you can use the build args:
 
 ---
 
-## git-crypt
+### git-crypt
 
 For deployment secrets, another option for encryption is
 [git crypt](https://github.com/AGWA/git-crypt),
@@ -152,7 +154,7 @@ selected to be encrypted.
 
 ---
 
-## Runtime secrets with AWS Secrets Manager
+## Runtime secrets
 
 If you are running your tasks in AWS, one option for runtime secrets
 is to store them in AWS Secrets Manager. When your Task runs, it can use
