@@ -7,7 +7,7 @@ nav_order: 7
 
 ## Background
 
-[aws-ecs-cloudreactor-deploy](https://github.com/CloudReactor/aws-ecs-cloudreactor-deployer)
+[aws-ecs-cloudreactor-deployer](https://github.com/CloudReactor/aws-ecs-cloudreactor-deployer)
 is a Docker image that is able to deploy Tasks to AWS ECS and CloudReactor.
 aws-ecs-cloudreactor-deploy uses
 [Ansible](https://docs.ansible.com/ansible/latest/index.html)
@@ -226,6 +226,7 @@ As an example, in a file named `.github/workflows/deploy.yml`, you could have
 something like this to deploy to your staging environment after you commit to
 the master branch:
 
+{% raw %}
     name: Deploy to AWS ECS and CloudReactor
     on:
       push:
@@ -251,6 +252,8 @@ the master branch:
             deployment-environment: staging
             cloudreactor-deploy-api-key: ${{ secrets.CLOUDREACTOR_DEPLOY_API_KEY }}
             log-level: DEBUG
+
+{% endraw %}
 
 In the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` GitHub secrets, you would set
 the access key ID and secret access key for the AWS user that has the permissions

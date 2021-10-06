@@ -23,7 +23,7 @@ Docker image to deploy to ECS as well do the CloudReactor registration. (It's
 also possible to make API calls to create Tasks directly if you know the ECS
 task definition ARN, but we won't cover that here.)
 
-## Prequisites
+## Pre-requisites
 
 The steps to [grant CloudReactor Task management access](/cloudreactor_access.html)
 are a pre-requisite for full integration.
