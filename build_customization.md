@@ -226,7 +226,7 @@ As an example, in a file named `.github/workflows/deploy.yml`, you could have
 something like this to deploy to your staging environment after you commit to
 the master branch:
 
-{% raw %}
+<!-- {% raw %} -->
     name: Deploy to AWS ECS and CloudReactor
     on:
       push:
@@ -253,7 +253,7 @@ the master branch:
             cloudreactor-deploy-api-key: ${{ secrets.CLOUDREACTOR_DEPLOY_API_KEY }}
             log-level: DEBUG
 
-{% endraw %}
+<!-- {% endraw %} -->
 
 In the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` GitHub secrets, you would set
 the access key ID and secret access key for the AWS user that has the permissions
