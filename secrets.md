@@ -47,7 +47,7 @@ In the example projects, to use ansible-vault to encrypt your deployment
 secrets, first create a password (method from [howtogeek](https://www.howtogeek.com/howto/30184/10-ways-to-generate-a-random-password-from-the-command-line/))
 in a directory outside your project. The example below use `$HOME/secrets`:
 
-< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c64 > vault_pass.txt
+    < /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c64 > $HOME/secrets/vault_pass.txt
 
 Then change your directory to `deploy_config/vars` and run:
 
@@ -63,8 +63,7 @@ Next, create a file `deploy.sh` with the following contents:
 
     set -e
 
-    export ANSIBLE_VAULT_PASSWORD=`cat ../secrets/vault_pass.txt`
-    EXTRA_DOCKER_RUN_OPTIONS="-e ANSIBLE_VAULT_PASSWORD"
+    export ANSIBLE_VAULT_PASSWORD=`cat $HOME/secrets/vault_pass.txt`
 
     ./cr_deploy.sh "$@"
 

@@ -34,7 +34,7 @@ First, decide on how much effort you're willing to invest in return for
 the features you want. The following table shows the tradeoffs:
 
 
-| Integration Level | Monitored |         Managed        | Requires Deployment Changes | Requires CloudReactor access grant  |
+| Integration Level | Monitored |         Managed        | Requires Deployment Changes | Requires CloudReactor Access Grant  |
 |-------------------|:---------:|:----------------------:|:---------------------------:|:-----------------------------------:|
 | Offline           |     No    |           No           |              Minimal             |                  No                 |
 | Passive           |    Yes    |        Stop only       |           Minimal           |                  No                 |

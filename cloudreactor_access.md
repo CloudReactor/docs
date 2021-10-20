@@ -55,14 +55,15 @@ and install [Docker Desktop](https://www.docker.com/products/docker-desktop){:ta
 2. Next, create a directory somewhere that the wizard can use to save your
 settings, between runs. For example,
 
-    `mkdir saved_state`
+        mkdir saved_state
 
 3. Now, run the image:
 
-    `docker run --rm -it -v $PWD/saved_state:/usr/app/saved_state cloudreactor/aws-setup-wizard`
+        docker run --rm -it -v $PWD/saved_state:/usr/app/saved_state cloudreactor/aws-setup-wizard
 
-which will use the saved_state subdirectory of the current directory to
-save settings.
+
+    which will use the saved_state subdirectory of the current directory to
+    save settings.
 
 4. Go through the wizard. The wizard lets you select a region, ECS cluster, VPC, subnet, etc. for you to run tasks in (and which CloudReactor will manage). And if any of those pieces don't exist, it can create them for you.
     - Questions with square brackets at the end indicate a default value: simply hit enter to accept the default. For example, `What do you want to name the CloudFormation stack to create a VPC? [ECS-VPC]` -- here, the default value is `ECS-VPC`.
