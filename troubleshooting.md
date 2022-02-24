@@ -25,7 +25,7 @@ These commands will take you to a bash shell inside the deployer Docker containe
       AnsibleFilterError: |combine expects dictionaries, got None"}
 
 This may be caused by defining a property like a task under `task_name_to_config`
-in `deploy/vars/common.yml`:
+in `deploy_config/vars/common.yml`:
 
     task_name_to_config:
        some_task:

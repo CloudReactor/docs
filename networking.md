@@ -37,13 +37,13 @@ Ultimately, you may want to review the following steps to confirm everything is 
 Once subnets are created and configured successfully, go to the [CloudReactor dashboard](https://dash.cloudreactor.io/run_environments) to add them to a Run Environment. Select a Run Environment, and under "default subnets", add the private subnets that you just created.
 
 Or, if you only created public subnets and want to deploy your tasks there, add the public subnet IDs instead. Note that in this instance, you'll need to assign your tasks with a public IP address. To do this in an example project, open
-`/deploy/vars/common.yml` and uncomment the line `assign_public_ip: True`.
+`/deploy_config/vars/common.yml` and uncomment the line `assign_public_ip: True`.
 
 Now, all tasks deployed to that Run Environment will use the default subnets set above.
 
 You can optionally over-ride the default subnets setting if required (if unsure, feel free to ignore!). In priority order (highest to lowest):
-- via `/deploy/vars/[run_environment].yml`: for example, a task called `new_task` to be deployed to the `production` environment could have a specific subnet over-ride by adding a block for the task in `production.yml`. See `/deploy/vars/example.yml` for an example.
-- via `/deploy/vars/common.yml`: again, you could add a configuration block here that includes a subnet definition.
+- via `/deploy_config/vars/[run_environment].yml`: for example, a task called `new_task` to be deployed to the `production` environment could have a specific subnet over-ride by adding a block for the task in `production.yml`. See `/deploy_config/vars/example.yml` for an example.
+- via `/deploy_config/vars/common.yml`: again, you could add a configuration block here that includes a subnet definition.
 
 ## Security Groups
 

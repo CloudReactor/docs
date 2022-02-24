@@ -116,7 +116,7 @@ If you use the
 Docker image to deploy your project, you can also set the Alert Methods of
 your Tasks during deployment. Normally, you will want to set different
 Alert Methods for each Run Environment in your deployment environment
-configuration file, for example `deploy/staging.yml`. In that file you can
+configuration file, for example `deploy_config/staging.yml`. In that file you can
 set the alert methods for the whole deployment environment in
 `default_env_task_config.alert_methods`, or per Task in
 `task_name_to_env_config.<task_name>.alert_methods`.  The

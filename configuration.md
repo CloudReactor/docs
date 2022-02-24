@@ -20,24 +20,24 @@ The settings are all (deeply) merged together with Ansible's Jinja2
 filter. The precedence of settings, from lowest to highest is:
 
 1. Settings found in your Run Environment that you set via the CloudReactor dashboard
-2. Deployment environment AWS settings -- found in `project_aws` in `deploy/vars/<environment>.yml`
-3. Default Task settings -- found in `default_task_config` in `deploy/vars/common.yml`
-4. Per Task settings -- found in `task_name_to_config.<task_name>` in `deploy/var/common.yml`
-5. Per environment settings -- found in `default_env_task_config` in `deploy/vars/<environment>.yml`.
-See `deploy/vars/example.yml` an example.
-6. Per Task, per environment settings -- found in `task_name_to_env_config.<task_name>` in `deploy/vars/<environment>.yml`
+2. Deployment environment AWS settings -- found in `project_aws` in `deploy_config/vars/<environment>.yml`
+3. Default Task settings -- found in `default_task_config` in `deploy_config/vars/common.yml`
+4. Per Task settings -- found in `task_name_to_config.<task_name>` in `deploy_config/var/common.yml`
+5. Per environment settings -- found in `default_env_task_config` in `deploy_config/vars/<environment>.yml`.
+See `deploy_config/vars/example.yml` an example.
+6. Per Task, per environment settings -- found in `task_name_to_env_config.<task_name>` in `deploy_config/vars/<environment>.yml`
 
 ## ECS Task Definition settings
 
 * You can add additional properties to the main container running each Task,
 such as `mountPoints` and `portMappings`  by setting
-`extra_main_container_properties` in common.yml or `deploy/vars/<environment>.yml`.
+`extra_main_container_properties` in common.yml or `deploy_config/vars/<environment>.yml`.
 See the `file_io` Task for an example of this.
 * You can add AWS ECS task properties, such as `volumes` and `secrets`,
 by setting `extra_task_definition_properties` in the `ecs` property of each task
 configuration. See the `file_io` Task for an example of this.
 * You can add additional containers to the Task by setting `extra_container_definitions`
-in `deploy/vars/common.yml` or `deploy/vars/<environment>.yml`.
+in `deploy_config/vars/common.yml` or `deploy_config/vars/<environment>.yml`.
 
 
 ## Setting management
@@ -58,7 +58,7 @@ To remove a Task, delete the Tasks within the
 [CloudReactor dashboard](https://dash.cloudreactor.io){:target="_blank"}.
 This will remove the Task rom AWS also.
 
-You should also remove the reference to the Tasks in `./deploy/vars/common.yml`.
+You should also remove the reference to the Tasks in `./deploy_config/vars/common.yml`.
 - If you don't, if you run `./cr_deploy.sh [environment]` (without task names), this will (re-)push all tasks -- which might include tasks you had intended to remove.
 
 You may also want to remove the task code itself from `/src/`
@@ -67,7 +67,7 @@ For example, if you want to delete the `task_1` Task:
 
 1. In [dash.cloudreactor.io](https://dash.cloudreactor.io){:target="_blank"},
 hit the delete icon next to `task_1` and hit "confirm".
-2. Open `./deploy/vars/common.yml` and delete the entire `task_1:` code block i.e.:
+2. Open `./deploy_config/vars/common.yml` and delete the entire `task_1:` code block i.e.:
 
     ```python
     task_1:

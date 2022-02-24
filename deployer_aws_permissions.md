@@ -30,7 +30,7 @@ For instructions on how to do that, see the
 main project page for [aws-role-template](https://github.com/CloudReactor/aws-role-template/).
 
 Once you have the access key and secret key output by the template,
-you can add them to `deploy/deploy.env` , or arrange to have the environment variables
+you can add them to `deploy_config/deploy.env` , or arrange to have the environment variables
 `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` set, along with
 `PASS_AWS_ACCESS_KEY=FALSE` before you run your deployment script
 (`cr_deploy.sh` or a custom wrapper script that calls `cr_deploy.sh`).
